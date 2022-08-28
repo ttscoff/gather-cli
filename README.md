@@ -44,6 +44,8 @@ You can have the URL pulled from your clipboard automatically with `--paste`. Ju
 
 You can also pass raw HTML to Gather and have it perform its magic on the source code. Just add `--html` to the command and it will parse it directly rather than trying to extract a URL. Depending on what's in your clipboard, Readability parsing can cause errors. If you run into trouble, run it without Readability using `--no-readability`. HTML can be passed via `--stdin` or `--paste`, e.g. `cat myfile.html | gather --html --stdin`.
 
+If you specify the `--html` and `--paste` flags, gather will first check your HTML pasteboard for content. This means that if you've copied by selecting text on a web page or any web view, gather can operate on that "rich text" version. If you've copied plain text source, that pasteboard will be empty and gather will fall back to using the plain text pasteboard.
+
 You can also pull a URL or HTML from an environment variable using `--env VARIABLE`. This is mainly for incorporation into things like PopClip, which passes HTML via the $POPCLIP_HTML variable.
 
 #### Output Options
