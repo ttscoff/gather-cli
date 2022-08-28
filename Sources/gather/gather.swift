@@ -3,6 +3,7 @@ import ArgumentParser
 import Foundation
 import HTML2Text
 import Readability
+var VERSION = "2.0.2"
 
 var disableReadability = false
 var inline = false
@@ -176,6 +177,9 @@ func readEnv(variable: String) -> String? {
 
 @main
 struct Gather: ParsableCommand {
+    @Flag(name: .shortAndLong, help: "Display current version number")
+    var version = false
+
     @Flag(name: .shortAndLong, help: "Get input from STDIN")
     var stdin = false
 
@@ -223,6 +227,10 @@ struct Gather: ParsableCommand {
         unicodeSnob = unicode
         // escapeSpecial = escape
         // wrapWidth = wrap
+
+        if version {
+            throw CleanExit.message("gather-cli v\(VERSION)")
+        }
 
         if html {
             if url != "" {
