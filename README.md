@@ -2,7 +2,7 @@
 
 <!-- README -->
 
-This project is the successor to read2text, which was a Python based tool that used Arc90 Readability and html2text to convert web urls to Markdown documents, ready to store in your notes.
+This project is the successor to read2text, which was a Python based tool that used Arc90 Readability and html2text to convert web urls to Markdown documents, ready to store in your notes. It takes its name from another of my similar projects that I've since retired. It was this, but with a GUI, and this is infinitely more scriptable and is designed to nestle into your favorite tools and projects.
 
 This version is Swift-based and compiled as a binary that doesn't require Python or any other processor to run. It has more options, better parsing, and should be an all-around useful tool, easy to incorporate into almost any project.
 
