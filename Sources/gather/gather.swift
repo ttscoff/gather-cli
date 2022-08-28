@@ -11,6 +11,9 @@ var grafLinks = true
 var unicodeSnob = true
 var escapeSpecial = false
 var wrapWidth = 0
+var acceptedAnswerOnly = false
+var includeAnswerComments = false
+var minimumAnswerUpvotes = 0
 
 func exitWithError(error: Int32, message: String? = nil) {
     if message != nil {
@@ -32,6 +35,9 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
         if read != false {
             do {
                 let readability = Readability(html: html!)
+                readability.acceptedAnswerOnly = acceptedAnswerOnly
+                readability.includeAnswerComments = includeAnswerComments
+                readability.minimumAnswerUpvotes = minimumAnswerUpvotes
                 let started = readability.start()
 
                 if started {
@@ -210,6 +216,15 @@ struct Gather: ParsableCommand {
     @Flag(inversion: .prefixedNo, help: "Use Unicode characters instead of ascii replacements")
     var unicode = true
 
+    @Flag(help: "Only save accepted answer from StackExchange question pages")
+    var acceptedOnly = false
+
+    @Option(help: "Only save answers from StackExchange page with minimum number of upvotes")
+    var minUpvotes: Int = 0
+
+    @Flag(help: "Include comments on StackExchange question pages")
+    var includeComments = false
+
     // @Option(name: .shortAndLong, help: "Wrap width (0 for no wrap)")
     // var wrap: Int = 0
 
@@ -236,6 +251,9 @@ struct Gather: ParsableCommand {
         }
 
         unicodeSnob = unicode
+        includeAnswerComments = includeComments
+        acceptedAnswerOnly = acceptedOnly
+        minimumAnswerUpvotes = minUpvotes
         // escapeSpecial = escape
         // wrapWidth = wrap
 
