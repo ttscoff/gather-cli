@@ -7,7 +7,7 @@ var VERSION = "2.0.2"
 
 var disableReadability = false
 var inline = false
-var paragraphLinks = true
+var grafLinks = true
 var unicodeSnob = true
 var escapeSpecial = false
 var wrapWidth = 0
@@ -47,7 +47,7 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
         }
 
         let h = HTML2Text(baseurl: baseurl!)
-        h.links_each_paragraph = paragraphLinks
+        h.links_each_paragraph = grafLinks
         h.inline_links = inline
         h.unicode_snob = unicodeSnob
         h.escape_snob = escapeSpecial
@@ -199,9 +199,9 @@ struct Gather: ParsableCommand {
     var readability = true
 
     @Flag(inversion: .prefixedNo, help: "Insert link references after each paragraph")
-    var linksEachParagraph = true
+    var paragraphLinks = true
 
-    @Flag(help: "Use inline links")
+    @Flag(inversion: .prefixedNo, help: "Use inline links")
     var inlineLinks = false
 
     // @Flag(help: "Escape special characters")
@@ -222,8 +222,19 @@ struct Gather: ParsableCommand {
     mutating func run() throws {
         var input: String?
 
-        inline = inlineLinks
-        paragraphLinks = linksEachParagraph
+        if inlineLinks {
+            if paragraphLinks {
+                throw ValidationError("error: --inline cannot be used with --paragraph-links")
+            }
+            inline = inlineLinks
+        } else if paragraphLinks {
+            if inline {
+                throw ValidationError("error: --inline cannot be used with --paragraph-links")
+            }
+
+            grafLinks = paragraphLinks
+        }
+
         unicodeSnob = unicode
         // escapeSpecial = escape
         // wrapWidth = wrap

@@ -8,5 +8,59 @@ This version is Swift-based and compiled as a binary that doesn't require Python
 
 The code is available [on GitHub](https://github.com/ttscoff/gather-cli). It's built as a Swift Package and can be compiled using the `swift` command line tool. I'm just learning Swift, so I guarantee there's a lot of stupidity in the code. If you dig in, feel free to kindly point out my errors.
 
+### Usage
+
+```console
+USAGE: gather [<options>] [<url>]
+
+ARGUMENTS:
+  <url>                   The URL to parse
+
+OPTIONS:
+  -v, --version           Display current version number
+  -s, --stdin             Get input from STDIN
+  -p, --paste             Get input from clipboard
+  --env <env>             Get input from and environment variable
+  -c, --copy              Copy output to clipboard
+  --html                  Expect raw HTML instead of a URL
+  --readability/--no-readability
+                          Use readability (default: true)
+  --paragraph-links/--no-paragraph-links
+                          Insert link references after each paragraph (default: true)
+  --inline-links/--no-inline-links
+                          Use inline links (default: false)
+  --unicode/--no-unicode  Use Unicode characters instead of ascii replacements (default: true)
+  -f, --file <file>       Save output to file path
+  -h, --help              Show help information.
+```
+
+In its simplest form, gather expects a URL. Just `gather https://brettterpstra.com` to perform a readability extraction of the main content and a conversion to Markdown, output to STDOUT.
+
+#### Input Options
+
+In addition to passing a URL as an argument, you can use `--stdin` to pass the URL via a pipe, e.g. `echo https://brettterpstra.com | gather --stdin`.
+
+You can have the URL pulled from your clipboard automatically with `--paste`. Just copy the URL from your browser and run `gather -p`. This is ideal for use in macOS Services or Shortcuts.
+
+You can also pass raw HTML to Gather and have it perform its magic on the source code. Just add `--html` to the command and it will parse it directly rather than trying to extract a URL. Depending on what's in your clipboard, Readability parsing can cause errors. If you run into trouble, run it without Readability using `--no-readability`. HTML can be passed via `--stdin` or `--paste`, e.g. `cat myfile.html | gather --html --stdin`.
+
+You can also pull a URL or HTML from an environment variable using `--env VARIABLE`. This is mainly for incorporation into things like PopClip, which passes HTML via the $POPCLIP_HTML variable.
+
+#### Output Options
+
+By default the formatted Markdown is output to STDOUT (your terminal screen), where it can be piped to a file or a clipboard utility. There are some built-in options for those things as well.
+
+If you add `--copy` the command, the output will be placed on the system clipboard.
+
+If you add `--file PATH` to the command, the results will be saved to the path you specify. Any existing files at that path will be overwritten. If you want to append output, you're better off using shell redirection, e.g. `gather myurl.com >> compilation.md`
+
+#### Formatting Options
+
+You can control the formatting of the output in a couple of ways.
+
+By default gather will use reference-style links, and will place the references directly after the paragraph where they occur. You can switch to inline links using `--inline`, and you can supress the per-paragraph linking and collect them all at the end of the document using `--no-paragraph-links`.
+
+By default gather will maintain Unicode characters in the output. If you'd prefer to have an ascii equivalent substituted, you can use `--no-unicode`. This feature may not be working properly yet.
+
 <!-- END README -->
 
