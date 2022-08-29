@@ -76,7 +76,7 @@ notarizefile() { # $1: path to file to notarize, $2: identifier
 xcrun swift build -c release --arch arm64 --arch x86_64
 rm -rf package
 mkdir -p package/usr/local/bin
-cp .build/release/gather gather/usr/local/bin/
+cp .build/release/gather package/usr/local/bin/
 
 pkgpath="$builddir/$productname-$version.pkg"
 
