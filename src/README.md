@@ -1,9 +1,10 @@
 # gather-cli
 
-![Howzit banner image](https://cdn3.brettterpstra.com/uploads/2022/08/gatherheader-rb.webp)
+<!--README-->
+<!--GITHUB-->![Howzit banner image](https://cdn3.brettterpstra.com/uploads/2022/08/gatherheader-rb.webp)<!--END GITHUB-->
+<!--JEKYLL{% img aligncenter 800 220 /uploads/2022/08/gatherheader-rb.jpg "Howzit banner image" %}-->
 
-
-Current version: 2.0.16
+Current version: <!--VER-->2.0.15<!--END VER-->
 
 This project is the successor to read2text, which was a Python based tool that used Arc90 Readability and html2text to convert web URLs to Markdown documents, ready to store in your notes. It takes its name from another of my similar projects that I've since retired. It was this, but with a GUI, and this is infinitely more scriptable and is designed to nestle into your favorite tools and projects.
 
@@ -28,10 +29,10 @@ The gather binary will be located in `.build/release/gather`. Copy it wherever y
 #### Downloading
 
 
-
+<!--GITHUB-->
 [Download the PKG installer from BrettTerpstra.com](https://cdn3.brettterpstra.com/downloads/gather-cli-latest.pkg)
-
-
+<!--END GITHUB-->
+<!--JEKYLL{% download 54 %}-->
 
 Double click to run the installer. This will install gather to /usr/local/bin with root permissions.
 
@@ -107,4 +108,5 @@ Comments can often be fruitful (and important) to an answer, but they also get m
 
 Lastly, sometimes there's more than one good answer worth saving, but a bunch of zero-vote errors in judgement you don't need in your notes. Use `--min-upvotes X` to filter answers by a minimum number of upvotes. For example, `--min-upvotes 60` would easily weed out the less-desirable answers on an older question. Filtering by upvotes does not affect the accepted answer, if that exists it's included no matter how many upvotes is has (or doesn't have).
 
+<!--END README-->
 
