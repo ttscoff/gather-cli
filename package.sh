@@ -74,9 +74,10 @@ notarizefile() { # $1: path to file to notarize, $2: identifier
 }
 
 xcrun swift build -c release --arch arm64 --arch x86_64
+bindir=$(xcrun swift build -c release --arch arm64 --arch x86_64 --show-bin-path)
 rm -rf package
 mkdir -p package/usr/local/bin
-cp .build/release/gather package/usr/local/bin/
+cp $binpath/gather package/usr/local/bin/
 
 pkgpath="$builddir/$productname-$version.pkg"
 
@@ -96,8 +97,5 @@ echo "## Stapling $pkgpath"
 xcrun stapler staple "$pkgpath"
 
 echo '## Done!'
-
-# show the pkg in Finder
-open -R "$pkgpath"
 
 exit 0
