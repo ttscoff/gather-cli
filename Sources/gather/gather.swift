@@ -3,7 +3,7 @@ import ArgumentParser
 import Foundation
 import HTML2Text
 import Readability
-var VERSION = "2.0.11"
+var VERSION = "2.0.12"
 
 var disableReadability = false
 var inline = false
