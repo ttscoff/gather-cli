@@ -77,7 +77,7 @@ xcrun swift build -c release --arch arm64 --arch x86_64
 bindir=$(xcrun swift build -c release --arch arm64 --arch x86_64 --show-bin-path)
 rm -rf package
 mkdir -p package/usr/local/bin
-cp $binpath/gather package/usr/local/bin/
+cp $bindir/gather package/usr/local/bin/
 
 pkgpath="$builddir/$productname-$version.pkg"
 
