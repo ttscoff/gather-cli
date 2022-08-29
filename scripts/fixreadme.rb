@@ -12,3 +12,5 @@ content.gsub!(/<!--GITHUB-->(.*?)<!--END GITHUB-->/m, '\1')
 content.gsub!(/<!--JEKYLL(.*?)-->/m, '')
 
 File.open(dest, 'w') { |f| f.puts(content) }
+
+Process.exit 0
