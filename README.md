@@ -4,7 +4,7 @@
 <!--GITHUB-->![Howzit banner image](https://cdn3.brettterpstra.com/uploads/2022/08/gatherheader-rb.webp)<!--END GITHUB-->
 <!--JEKYLL{% img aligncenter 800 220 /uploads/2022/08/gatherheader-rb.jpg "Howzit banner image" %}-->
 
-Current version: <!--VER-->2.0.9<!--END VER-->
+Current version: <!--VER-->2.0.10<!--END VER-->
 
 > **Note:** I'm currently having trouble figuring out how to make this tool work with Apple's macOS security when it's downloaded from the internet. See the installation notes below.
 
@@ -34,7 +34,7 @@ You can bypass the below rigamarole if you use `curl` or `wget` to download the 
 
 ```
 cd ~/Downloads
-curl -O https://cdn3.brettterpstra.com/downloads/gather-cli-latest.zip
+curl -O https://cdn3.brettterpstra.com/downloads/gather-cli<!--VER-->2.0.10<!--END VER-->.zip
 ```
 
 Then you can unzip and move the gather CLI into your PATH.
