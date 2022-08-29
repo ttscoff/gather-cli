@@ -3,7 +3,7 @@ import ArgumentParser
 import Foundation
 import HTML2Text
 import Readability
-var VERSION = "2.0.18"
+var VERSION = "2.0.19"
 
 var disableReadability = false
 var inline = false
@@ -35,6 +35,7 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
         if read != false {
             do {
                 let readability = Readability(html: html!)
+                readability.allSpecialHandling = true
                 readability.acceptedAnswerOnly = acceptedAnswerOnly
                 readability.includeAnswerComments = includeAnswerComments
                 readability.minimumAnswerUpvotes = minimumAnswerUpvotes

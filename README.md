@@ -1,9 +1,10 @@
-# gather-cli
+# Gather CLI
+
 
 ![Howzit banner image](https://cdn3.brettterpstra.com/uploads/2022/08/gatherheader-rb.webp)
 
 
-Current version: 2.0.18
+Current version: 2.0.19
 
 This project is the successor to read2text, which was a Python based tool that used Arc90 Readability and html2text to convert web URLs to Markdown documents, ready to store in your notes. It takes its name from another of my similar projects that I've since retired. It was this, but with a GUI, and this is infinitely more scriptable and is designed to nestle into your favorite tools and projects.
 
@@ -106,5 +107,4 @@ To save only the accepted answer (if there is one) for a question, use `--accept
 Comments can often be fruitful (and important) to an answer, but they also get messy on popular posts, so they're ignored by default. To include comments when saving a StackExchange page, just add `--include-comments`.
 
 Lastly, sometimes there's more than one good answer worth saving, but a bunch of zero-vote errors in judgement you don't need in your notes. Use `--min-upvotes X` to filter answers by a minimum number of upvotes. For example, `--min-upvotes 60` would easily weed out the less-desirable answers on an older question. Filtering by upvotes does not affect the accepted answer, if that exists it's included no matter how many upvotes is has (or doesn't have).
-
 

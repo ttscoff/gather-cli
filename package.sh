@@ -1,3 +1,4 @@
+#!/bin/bash
 version=$1
 
 # the email address of your developer account
@@ -75,6 +76,8 @@ notarizefile() { # $1: path to file to notarize, $2: identifier
 
 xcrun swift build -c release --arch arm64 --arch x86_64
 bindir=$(xcrun swift build -c release --arch arm64 --arch x86_64 --show-bin-path)
+codesign --force --verbose --sign 'Developer ID Application: Brett Terpstra' -o runtime --timestamp $bindir/gather
+codesign --verify -vvvv $bindir/gather
 rm -rf package
 mkdir -p package/usr/local/bin
 cp $bindir/gather package/usr/local/bin/

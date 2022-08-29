@@ -6,7 +6,7 @@
       "location" : "https://github.com/ttscoff/html2text-swift.git",
       "state" : {
         "branch" : "master",
-        "revision" : "4d41875fd134e7bd81865765c33310cd668ba605"
+        "revision" : "daed94c8cb2b930514281269fb7ada9f63ea6c7b"
       }
     },
     {
@@ -15,7 +15,7 @@
       "location" : "https://github.com/ttscoff/read-swift.git",
       "state" : {
         "branch" : "master",
-        "revision" : "bec80911b1e36f7847e8bd6d6ed118189c720b50"
+        "revision" : "b8da472b2f8a3eab0668456abbcc8d33a4ebab56"
       }
     },
     {
