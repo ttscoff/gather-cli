@@ -4,13 +4,48 @@
 <!--GITHUB-->![Howzit banner image](https://cdn3.brettterpstra.com/uploads/2022/08/gatherheader-rb.webp)<!--END GITHUB-->
 <!--JEKYLL{% img aligncenter 800 220 /uploads/2022/08/gatherheader-rb.jpg "Howzit banner image" %}-->
 
-Current version: <!--VER-->2.0.8<!--END VER-->
+Current version: <!--VER-->2.0.9<!--END VER-->
+
+> **Note:** I'm currently having trouble figuring out how to make this tool work with Apple's macOS security when it's downloaded from the internet. See the installation notes below.
 
 This project is the successor to read2text, which was a Python based tool that used Arc90 Readability and html2text to convert web URLs to Markdown documents, ready to store in your notes. It takes its name from another of my similar projects that I've since retired. It was this, but with a GUI, and this is infinitely more scriptable and is designed to nestle into your favorite tools and projects.
 
 This version is Swift-based and compiled as a binary that doesn't require Python or any other processor to run. It has more options, better parsing, and should be an all-around useful tool, easy to incorporate into almost any project.
 
 The code is available [on GitHub](https://github.com/ttscoff/gather-cli). It's built as a Swift Package and can be compiled using the `swift` command line tool. I'm just learning Swift, so I guarantee there's a lot of stupidity in the code. If you dig in, feel free to kindly point out my errors.
+
+### Installation
+
+The first options is to compile it yourself.
+
+You can build your own binary by downloading the source code and running the swift compiler:
+
+```
+git clone https://github.com/ttscoff/gather-cli
+cd gather-cli
+swift build -c release
+```
+
+The gather binary will be located in `.build/release/gather`. Copy it wherever you keep your binaries in your PATH.
+
+#### Downloading
+
+You can bypass the below rigamarole if you use `curl` or `wget` to download the package in Terminal.
+
+```
+cd ~/Downloads
+curl -O https://cdn3.brettterpstra.com/downloads/gather-cli-latest.zip
+```
+
+Then you can unzip and move the gather CLI into your PATH.
+
+#### The hardest easy way
+
+If you download the [zip file from BrettTerpstra.com](https://brettterpstra.com/projects/gather-cli), unzip it and open the folder. Because a "quarantine" bit gets set on the binary (macOS) when it's downloaded from a website, you won't be able to run it without approving it. Be sure that your System Preferences->Privacy and Security settings allow apps from 3rd party developers, then right click on the gather binary and select "Open". It will give you a warning about an unknown developer, but open it anyway. I promise it's safe. Once you've open and executed it once in this fashion, you'll be able to use it.
+
+The other option for getting it running is to open Terminal, cd to the directory with the gather binary, and run `xattr -d com.apple.quarantine gather`.
+
+I know this is a pain. The binary is codesigned and safe to run, but I can't seem to get around the quarantine. I'm working on figuring out how to distribute this in a simpler way. Hopefully I'll figure out how to do it through Homebrew or a signed PKG installer.
 
 ### Usage
 
