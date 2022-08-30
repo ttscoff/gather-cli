@@ -7,6 +7,7 @@ var VERSION = "2.0.22"
 
 var disableReadability = false
 var inline = false
+var includeTitleAsH1 = true
 var grafLinks = true
 var unicodeSnob = true
 var escapeSpecial = false
@@ -74,7 +75,11 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
 
         if url != nil {
             if title != nil {
-                source = "[Source](\(url!) \"\(title!)\")\n\n"
+                if includeTitleAsH1 {
+                    source = "# \(title!)\n\n[Source](\(url!) \"\(title!)\")\n\n"
+                } else {
+                    source = "[Source](\(url!) \"\(title!)\")\n\n"
+                }
             } else {
                 source = "[Source](\(url!))\n\n"
             }
@@ -211,6 +216,9 @@ struct Gather: ParsableCommand {
     @Flag(inversion: .prefixedNo, help: "Use inline links")
     var inlineLinks = false
 
+    @Flag(inversion: .prefixedNo, help: "Include page title as h1")
+    var includeTitle = true
+
     // @Flag(help: "Escape special characters")
     // var escape = false
 
@@ -255,6 +263,7 @@ struct Gather: ParsableCommand {
         includeAnswerComments = includeComments
         acceptedAnswerOnly = acceptedOnly
         minimumAnswerUpvotes = minUpvotes
+        includeTitleAsH1 = includeTitle
         // escapeSpecial = escape
         // wrapWidth = wrap
 
