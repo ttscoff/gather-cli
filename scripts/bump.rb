@@ -1,4 +1,7 @@
-#!/usr/bin/env ruby -rcsv -rfileutils
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'csv'
 
 mainfile = ARGV[0]
 new_version = ARGV[1]
@@ -9,11 +12,11 @@ File.open(mainfile, 'w') { |f| f.puts content }
 src = 'src/README.md'
 dest = 'README.md'
 
-readme = IO.read(src).force_encoding('ASCII-8BIT').encode('UTF-8', :invalid => :replace, :undef => :replace, :replace => '?')
+readme = IO.read(src).force_encoding('ASCII-8BIT').encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
 
 content = readme.match(/(?<=\<!--README-->)(.*?)(?=\<!--END README-->)/m)[0]
 content = "# Gather CLI\n\n#{content}"
-content.gsub!(/\<!--VER-->(.*?)\<!--END VER-->/, new_version)
+content.gsub!(/<!--VER-->(.*?)<!--END VER-->/, new_version)
 content.gsub!(/<!--GITHUB-->(.*?)<!--END GITHUB-->/m, '\1')
 content.gsub!(/<!--JEKYLL(.*?)-->/m, '')
 
