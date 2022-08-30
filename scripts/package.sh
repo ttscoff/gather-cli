@@ -1,6 +1,11 @@
 #!/bin/bash
+# Package and notarize a command line tool
+# package.sh PRODUCT_NAME BUNDLE_ID EXECUTABLE_NAME VERSION
 
-version=$1
+productname=$1
+identifier=$2
+executable=$3
+version=$4
 
 # the email address of your developer account
 dev_account="me@brettterpstra.com"
@@ -13,11 +18,6 @@ dev_team="47TRS7H4BH"
 
 # the label of the keychain item which contains an app-specific password
 dev_keychain_label="Developer-altool"
-
-# put your project's information into these variables
-
-identifier="com.brettterpstra.gather-cli"
-productname="gather-cli"
 
 projectdir='.'
 
@@ -77,11 +77,11 @@ notarizefile() { # $1: path to file to notarize, $2: identifier
 
 xcrun swift build -c release --arch arm64 --arch x86_64
 bindir=$(xcrun swift build -c release --arch arm64 --arch x86_64 --show-bin-path)
-codesign --force --verbose --sign 'Developer ID Application: Brett Terpstra' -o runtime --timestamp $bindir/gather
-codesign --verify -vvvv $bindir/gather
+codesign --force --verbose --sign 'Developer ID Application: Brett Terpstra' -o runtime --timestamp $bindir/$executable
+codesign --verify -vvvv $bindir/$executable
 rm -rf package
 mkdir -p package/usr/local/bin
-cp $bindir/gather package/usr/local/bin/
+cp $bindir/$executable package/usr/local/bin/
 
 pkgpath="$builddir/$productname-$version.pkg"
 
