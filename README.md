@@ -14,11 +14,20 @@ The code is available [on GitHub](https://github.com/ttscoff/gather-cli). It's b
 
 ### Installation
 
-The first options is to compile it yourself.
+#### Via Homebrew
+
+The easiest way to install Gather is with [Homebrew](https://brew.sh):
+
+```console
+brew tap ttscoff/thelab
+brew install gather-cli
+```
+
+#### Manual Install
 
 You can build your own binary by downloading the source code and running the swift compiler:
 
-```
+```console
 git clone https://github.com/ttscoff/gather-cli
 cd gather-cli
 swift build -c release
