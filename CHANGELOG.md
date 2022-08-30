@@ -5,10 +5,6 @@
 - Missing space around links in text
 - Include h1 title, can be disabled with --no-include-title
 
-## 2.0.22
-
-## 2.0.21
-
 ## 2.0.20
 
 #### FIXED
