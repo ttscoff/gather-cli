@@ -3,7 +3,7 @@ import ArgumentParser
 import Foundation
 import HTML2Text
 import Readability
-var VERSION = "2.0.23"
+var VERSION = "2.0.24"
 
 var acceptedAnswerOnly = false
 var disableReadability = false

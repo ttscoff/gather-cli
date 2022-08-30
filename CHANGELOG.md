@@ -1,3 +1,15 @@
+## 2.0.24
+
+#### NEW
+
+- --[no-]include-title to enable/disable the inclusion of an h1 with the page title
+- --[no-]include-source option to enable/disable the source link
+- --metadata option to include MultiMarkdown metadata with title, source, and current date
+
+#### IMPROVED
+
+- Sort options in --help
+
 ## 2.0.23
 
 #### FIXED
