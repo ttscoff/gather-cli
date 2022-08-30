@@ -5,16 +5,18 @@ import HTML2Text
 import Readability
 var VERSION = "2.0.23"
 
-var disableReadability = false
-var inline = false
-var includeTitleAsH1 = true
-var grafLinks = true
-var unicodeSnob = true
-var escapeSpecial = false
-var wrapWidth = 0
 var acceptedAnswerOnly = false
+var disableReadability = false
+var escapeSpecial = false
+var grafLinks = true
 var includeAnswerComments = false
+var includeMetadata = false
+var includeSourceLink = true
+var includeTitleAsH1 = true
+var inline = false
 var minimumAnswerUpvotes = 0
+var unicodeSnob = true
+var wrapWidth = 0
 
 func exitWithError(error: Int32, message: String? = nil) {
     if message != nil {
@@ -72,8 +74,28 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
         html = html!.replacingOccurrences(of: "__BR__", with: "  ")
 
         var source = ""
+        var meta = ""
 
-        if url != nil {
+        if includeMetadata {
+            let dateFormatterPrint = DateFormatter()
+            dateFormatterPrint.dateFormat = "yyyy-MM-dd HH:mm"
+            let date = dateFormatterPrint.string(from: Date())
+
+            if title != nil {
+                meta += "title: \"\(title!)\""
+            } else {
+                meta += "title: Clipped on \(date)"
+            }
+
+            if url != nil {
+                meta += "\nsource: \(url!)"
+            }
+
+            meta += "\ndate: \(date)"
+            meta += "\n\n"
+        }
+
+        if includeSourceLink, url != nil {
             if title != nil {
                 if includeTitleAsH1 {
                     source = "# \(title!)\n\n[Source](\(url!) \"\(title!)\")\n\n"
@@ -85,7 +107,7 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
             }
         }
 
-        html = "\(source)\(html!)"
+        html = "\(meta)\(source)\(html!)"
 
         return html!
     }
@@ -189,38 +211,44 @@ func readEnv(variable: String) -> String? {
 
 @main
 struct Gather: ParsableCommand {
-    @Flag(name: .shortAndLong, help: "Display current version number")
-    var version = false
-
-    @Flag(name: .shortAndLong, help: "Get input from STDIN")
-    var stdin = false
-
-    @Flag(name: .shortAndLong, help: "Get input from clipboard")
-    var paste = false
+    @Flag(name: .shortAndLong, help: "Copy output to clipboard")
+    var copy = false
 
     @Option(help: "Get input from and environment variable")
     var env: String = ""
 
-    @Flag(name: .shortAndLong, help: "Copy output to clipboard")
-    var copy = false
+    // @Flag(help: "Escape special characters")
+    // var escape = false
+
+    @Option(name: .shortAndLong, help: "Save output to file path", completion: .file())
+    var file: String = ""
 
     @Flag(help: "Expect raw HTML instead of a URL")
     var html = false
 
-    @Flag(inversion: .prefixedNo, help: "Use readability")
-    var readability = true
-
-    @Flag(inversion: .prefixedNo, help: "Insert link references after each paragraph")
-    var paragraphLinks = true
-
-    @Flag(inversion: .prefixedNo, help: "Use inline links")
-    var inlineLinks = false
+    @Flag(inversion: .prefixedNo, help: "Include source link to original URL")
+    var includeSource = true
 
     @Flag(inversion: .prefixedNo, help: "Include page title as h1")
     var includeTitle = true
 
-    // @Flag(help: "Escape special characters")
-    // var escape = false
+    @Flag(help: "Use inline links")
+    var inlineLinks = false
+
+    @Flag(help: "Include page title, date as MultiMarkdown metadata")
+    var metadata = false
+
+    @Flag(name: .shortAndLong, help: "Get input from clipboard")
+    var paste = false
+
+    @Flag(inversion: .prefixedNo, help: "Insert link references after each paragraph")
+    var paragraphLinks = true
+
+    @Flag(inversion: .prefixedNo, help: "Use readability")
+    var readability = true
+
+    @Flag(name: .shortAndLong, help: "Get input from STDIN")
+    var stdin = false
 
     @Flag(inversion: .prefixedNo, help: "Use Unicode characters instead of ascii replacements")
     var unicode = true
@@ -228,17 +256,17 @@ struct Gather: ParsableCommand {
     @Flag(help: "Only save accepted answer from StackExchange question pages")
     var acceptedOnly = false
 
-    @Option(help: "Only save answers from StackExchange page with minimum number of upvotes")
-    var minUpvotes: Int = 0
-
     @Flag(help: "Include comments on StackExchange question pages")
     var includeComments = false
+
+    @Option(help: "Only save answers from StackExchange page with minimum number of upvotes")
+    var minUpvotes: Int = 0
 
     // @Option(name: .shortAndLong, help: "Wrap width (0 for no wrap)")
     // var wrap: Int = 0
 
-    @Option(name: .shortAndLong, help: "Save output to file path", completion: .file())
-    var file: String = ""
+    @Flag(name: .shortAndLong, help: "Display current version number")
+    var version = false
 
     @Argument(help: "The URL to parse")
     var url: String = ""
@@ -264,6 +292,8 @@ struct Gather: ParsableCommand {
         acceptedAnswerOnly = acceptedOnly
         minimumAnswerUpvotes = minUpvotes
         includeTitleAsH1 = includeTitle
+        includeMetadata = metadata
+        includeSourceLink = includeSource
         // escapeSpecial = escape
         // wrapWidth = wrap
 
