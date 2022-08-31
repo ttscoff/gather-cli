@@ -1,9 +1,10 @@
 import AppKit
 import ArgumentParser
+import Cocoa
 import Foundation
 import HTML2Text
 import Readability
-var VERSION = "2.0.25"
+var VERSION = "2.0.26"
 
 var acceptedAnswerOnly = false
 var disableReadability = false
@@ -13,6 +14,7 @@ var includeAnswerComments = false
 var includeMetadata = false
 var includeSourceLink = true
 var includeTitleAsH1 = true
+var onlyOutputTitle = false
 var inline = false
 var minimumAnswerUpvotes = 0
 var unicodeSnob = true
@@ -25,12 +27,46 @@ func exitWithError(error: Int32, message: String? = nil) {
     exit(error)
 }
 
-func markdownify_input(html: String?, read: Bool?) -> String {
+func get_title(html: String?, url: String?) -> String? {
+    var title = String?(nil)
+
+    if html != nil {
+        do {
+            let readability = Readability(html: html!)
+            let started = readability.start()
+
+            if started {
+                title = try readability.getTitle()?.text()
+            }
+
+        } catch {
+            print("Error parsing page")
+            return title
+        }
+    } else if url != nil {
+        let u = url!.replacingOccurrences(of: "[?&]utm_[^#]+", with: "", options: .regularExpression)
+        guard let page = try? String(contentsOf: URL(string: u)!, encoding: .utf8) else {
+            return title
+        }
+
+        title = get_title(html: page, url: nil)
+    }
+
+    return title
+}
+
+func iso_datetime() -> String {
+    let dateFormatterPrint = DateFormatter()
+    dateFormatterPrint.dateFormat = "yyyy-MM-dd HH:mm"
+    return dateFormatterPrint.string(from: Date())
+}
+
+func markdownify_input(html: String?, read: Bool?) -> (String?, String) {
     let read = read
     return markdownify_html(html: html, read: read, url: nil)
 }
 
-func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String? = "") -> String {
+func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String? = "") -> (String?, String) {
     var html = html
     var title = String?(nil)
 
@@ -77,9 +113,7 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
         var meta = ""
 
         if includeMetadata {
-            let dateFormatterPrint = DateFormatter()
-            dateFormatterPrint.dateFormat = "yyyy-MM-dd HH:mm"
-            let date = dateFormatterPrint.string(from: Date())
+            let date = iso_datetime()
 
             if title != nil {
                 meta += "title: \"\(title!)\""
@@ -109,26 +143,26 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
 
         html = "\(meta)\(source)\(html!)"
 
-        return html!
+        return (title, html!)
     }
 
-    return ""
+    return (title, "")
 }
 
-func markdownify(url: String?, read: Bool?) -> String {
+func markdownify(url: String?, read: Bool?) -> (String?, String) {
     var url = url
     var html = String?(nil)
     var baseurl = url
 
     if url == nil, html == nil {
-        return "No valid url, html or text was provided."
+        return (nil, "No valid url, html or text was provided.")
     }
 
     if url != nil {
         let u = url!.replacingOccurrences(of: "[?&]utm_[^#]+", with: "", options: .regularExpression)
         guard let base = URL(string: u) else {
             exitWithError(error: 1, message: "error: invalid URL")
-            return ""
+            return (nil, "")
         }
 
         let scheme = base.scheme
@@ -142,7 +176,7 @@ func markdownify(url: String?, read: Bool?) -> String {
         }
 
         guard let page = try? String(contentsOf: URL(string: u)!, encoding: .utf8) else {
-            return ""
+            return (nil, "")
         }
 
         html = page
@@ -150,6 +184,29 @@ func markdownify(url: String?, read: Bool?) -> String {
     }
 
     return markdownify_html(html: html, read: read, url: url, baseurl: baseurl)
+}
+
+func createNvUltraURL(markdown: String?, title: String?, notebook: String?) -> String {
+    var note_title = ""
+
+    if title == nil {
+        note_title = "\(iso_datetime()) Clipped Note"
+    } else {
+        note_title = title!
+    }
+
+    var components = URLComponents()
+    components.scheme = "x-nvultra"
+    components.host = "make"
+    components.path = "/"
+
+    components.queryItems = [
+        URLQueryItem(name: "txt", value: markdown),
+        URLQueryItem(name: "title", value: note_title),
+        URLQueryItem(name: "notebook", value: notebook),
+    ]
+
+    return components.string ?? ""
 }
 
 func readFromClipboard(html: Bool = false) -> String? {
@@ -235,7 +292,7 @@ struct Gather: ParsableCommand {
     @Flag(help: "Use inline links")
     var inlineLinks = false
 
-    @Flag(help: "Include page title, date as MultiMarkdown metadata")
+    @Flag(help: "Include page title, date, source url as MultiMarkdown metadata")
     var metadata = false
 
     @Flag(name: .shortAndLong, help: "Get input from clipboard")
@@ -249,6 +306,9 @@ struct Gather: ParsableCommand {
 
     @Flag(name: .shortAndLong, help: "Get input from STDIN")
     var stdin = false
+
+    @Flag(name: .shortAndLong, help: "Output only page title")
+    var titleOnly = false
 
     @Flag(inversion: .prefixedNo, help: "Use Unicode characters instead of ascii replacements")
     var unicode = true
@@ -264,6 +324,15 @@ struct Gather: ParsableCommand {
 
     // @Option(name: .shortAndLong, help: "Wrap width (0 for no wrap)")
     // var wrap: Int = 0
+
+    @Flag(help: "Output as an nvUltra URL")
+    var nvUrl = false
+
+    @Flag(help: "Add output to nvUltra immediately")
+    var nvAdd = false
+
+    @Option(help: "Specify an nvUltra notebook for the 'make' URL")
+    var nvNotebook: String = ""
 
     @Flag(name: .shortAndLong, help: "Display current version number")
     var version = false
@@ -292,6 +361,7 @@ struct Gather: ParsableCommand {
         acceptedAnswerOnly = acceptedOnly
         minimumAnswerUpvotes = minUpvotes
         includeTitleAsH1 = includeTitle
+        onlyOutputTitle = titleOnly
         includeMetadata = metadata
         includeSourceLink = includeSource
         // escapeSpecial = escape
@@ -342,28 +412,66 @@ struct Gather: ParsableCommand {
             }
         }
 
-        var output: String? = ""
+        var output: String?
+        var title: String?
+        var markdown: String
 
         if input != nil {
-            output = markdownify_input(html: input, read: readability).trimmingCharacters(in: .whitespacesAndNewlines)
+            (title, markdown) = markdownify_input(html: input, read: readability)
+            // if onlyOutputTitle {
+            //     if let title = get_title(html: input, url: nil) {
+            //         output = title.trimmingCharacters(in: .whitespacesAndNewlines)
+            //     }
+            // } else {
+            //     output = markdownify_input(html: input, read: readability).trimmingCharacters(in: .whitespacesAndNewlines)
+            // }
         } else if url != "" {
-            output = markdownify(url: url, read: readability).trimmingCharacters(in: .whitespacesAndNewlines)
+            (title, markdown) = markdownify(url: url, read: readability)
+            // if onlyOutputTitle {
+            //     if let title = get_title(html: nil, url: url) {
+            //         output = title.trimmingCharacters(in: .whitespacesAndNewlines)
+            //     }
+            // } else {
+            //     output = markdownify(url: url, read: readability).trimmingCharacters(in: .whitespacesAndNewlines)
+            // }
         } else {
             throw CleanExit.helpRequest()
         }
 
-        if copy {
-            if file != "" {
-                throw ValidationError("error: --copy cannot be used with --file")
-            }
-            writeToClipboard(string: output!)
-        } else if file != "" {
-            if copy {
-                throw ValidationError("error: --copy cannot be used with --file")
-            }
-            writeToFile(filename: file, content: output!)
+        if onlyOutputTitle {
+            output = title!.trimmingCharacters(in: .whitespacesAndNewlines)
         } else {
-            print(output!)
+            output = markdown.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+
+        if output != nil {
+            if nvUrl || nvAdd {
+                output = createNvUltraURL(markdown: markdown, title: title, notebook: nvNotebook)
+
+                if nvAdd {
+                    let url = URL(string: output!)!
+                    if NSWorkspace.shared.open(url) {
+                        throw CleanExit.message("Added to nvUltra")
+                    }
+                    throw ValidationError("Error adding to nvUltra")
+                }
+            }
+
+            if copy {
+                if file != "" {
+                    throw ValidationError("error: --copy cannot be used with --file")
+                }
+                writeToClipboard(string: output!)
+            } else if file != "" {
+                if copy {
+                    throw ValidationError("error: --copy cannot be used with --file")
+                }
+                writeToFile(filename: file, content: output!)
+            } else {
+                print(output!)
+            }
+        } else {
+            throw ValidationError("Empty output")
         }
     }
 }
