@@ -10,3 +10,5 @@ DerivedData/
 build
 *.pkg
 package
+.gitsecret/keys/random_seed
+!*.secret
