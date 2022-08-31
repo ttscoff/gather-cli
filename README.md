@@ -4,7 +4,7 @@
 ![Howzit banner image](https://cdn3.brettterpstra.com/uploads/2022/08/gatherheader-rb.webp)
 
 
-Current version: 2.0.28
+Current version: 2.0.29
 
 This project is the successor to read2text, which was a Python based tool that used Arc90 Readability and html2text to convert web URLs to Markdown documents, ready to store in your notes. It takes its name from another of my similar projects that I've since retired. It was this, but with a GUI, and this is infinitely more scriptable and is designed to nestle into your favorite tools and projects.
 
@@ -117,15 +117,17 @@ Comments can often be fruitful (and important) to an answer, but they also get m
 
 Lastly, sometimes there's more than one good answer worth saving, but a bunch of zero-vote errors in judgement you don't need in your notes. Use `--min-upvotes X` to filter answers by a minimum number of upvotes. For example, `--min-upvotes 60` would easily weed out the less-desirable answers on an older question. Filtering by upvotes does not affect the accepted answer, if that exists it's included no matter how many upvotes is has (or doesn't have).
 
-#### nvUltra Options
+#### nvUltra/nvALT Options
 
 If you're running nvUltra, you can output clipped web pages directly to a notebook.
 
-`--nv-url` will generate a x-nvultra://make url that, when opened, will add the markdown version of the web page as a note, titled with the page title. This flag simply outputs the url (or copies it with `--copy`) and can be used as part of another script that handles the link.
+`--nvu-url` will generate a x-nvultra://make url that, when opened, will add the markdown version of the web page as a note, titled with the page title. This flag simply outputs the url (or copies it with `--copy`) and can be used as part of another script that handles the link.
 
-`--nv-add` will immediately open the url and add your note to nvUltra.
+`--nvu-add` will immediately open the url and add your note to nvUltra.
 
-You can include a `--nv-notebook PATH` option to specify which notebook the note gets added to. If this is left out, the note will be added to the frontmost open notebook in nvUltra.
+You can include a `--nvu-notebook PATH` option to specify which notebook the note gets added to. If this is left out, the note will be added to the frontmost open notebook in nvUltra.
 
 [Here's a Shortcut](https://github.com/ttscoff/gather-cli/raw/main/extras/Gather%20to%20nvUltra.shortcut) that accepts text or URLs and runs `gather --nv-add` on them. I trigger it with LaunchBar to send the current page from my browser straight to nvUltra.
+
+The `url` and `add` options work with just `--nv` instead of `--nvu` to generate an `nv://` url that will work with Notational Velocity or nvALT.
 

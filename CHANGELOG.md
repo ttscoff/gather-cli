@@ -1,3 +1,13 @@
+## 2.0.29
+
+#### CHANGED
+
+- Moved the new --nv-add/url options to --nvu-add/url
+
+#### NEW
+
+- Generate nvALT urls and notes with --nv-url and --nv-add
+
 ## 2.0.28
 
 #### NEW
