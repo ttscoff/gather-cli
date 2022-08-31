@@ -1,8 +1,13 @@
+## 2.0.28
+
+#### NEW
+
+- --nv-url to output results as an nvUltra url handler url
+- --nv-add to immediately create a new note in nvUltra
+- --nv-notebook to specify a path to the notebook folder you wish to use
+- --title-only to output only the title of the page
+
 ## 2.0.27
-
-## 2.0.25
-
-## 2.0.24
 
 #### NEW
 
