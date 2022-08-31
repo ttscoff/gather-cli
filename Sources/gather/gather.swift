@@ -460,7 +460,7 @@ struct Gather: ParsableCommand {
 
         if output != nil {
             if nvuUrl || nvuAdd {
-                output = createNvUltraURL(markdown: markdown, title: title, notebook: nvNotebook)
+                output = createNvUltraURL(markdown: markdown, title: title, notebook: nvuNotebook)
 
                 if nvuAdd {
                     let url = URL(string: output!)!
