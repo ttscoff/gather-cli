@@ -209,6 +209,28 @@ func createNvUltraURL(markdown: String?, title: String?, notebook: String?) -> S
     return components.string ?? ""
 }
 
+func createNvURL(markdown: String?, title: String?) -> String {
+    var note_title = ""
+
+    if title == nil {
+        note_title = "\(iso_datetime()) Clipped Note"
+    } else {
+        note_title = title!
+    }
+
+    var components = URLComponents()
+    components.scheme = "nv"
+    components.host = "make"
+    components.path = "/"
+
+    components.queryItems = [
+        URLQueryItem(name: "txt", value: markdown),
+        URLQueryItem(name: "title", value: note_title),
+    ]
+
+    return components.string ?? ""
+}
+
 func readFromClipboard(html: Bool = false) -> String? {
     let pasteboard = NSPasteboard.general
     var output: String?
@@ -325,14 +347,20 @@ struct Gather: ParsableCommand {
     // @Option(name: .shortAndLong, help: "Wrap width (0 for no wrap)")
     // var wrap: Int = 0
 
-    @Flag(help: "Output as an nvUltra URL")
+    @Flag(help: "Output as an Notational Velocity/nvALT URL")
     var nvUrl = false
 
-    @Flag(help: "Add output to nvUltra immediately")
+    @Flag(help: "Add output to Notational Velocity/nvALT immediately")
     var nvAdd = false
 
+    @Flag(help: "Output as an nvUltra URL")
+    var nvuUrl = false
+
+    @Flag(help: "Add output to nvUltra immediately")
+    var nvuAdd = false
+
     @Option(help: "Specify an nvUltra notebook for the 'make' URL")
-    var nvNotebook: String = ""
+    var nvuNotebook: String = ""
 
     @Flag(name: .shortAndLong, help: "Display current version number")
     var version = false
@@ -418,22 +446,8 @@ struct Gather: ParsableCommand {
 
         if input != nil {
             (title, markdown) = markdownify_input(html: input, read: readability)
-            // if onlyOutputTitle {
-            //     if let title = get_title(html: input, url: nil) {
-            //         output = title.trimmingCharacters(in: .whitespacesAndNewlines)
-            //     }
-            // } else {
-            //     output = markdownify_input(html: input, read: readability).trimmingCharacters(in: .whitespacesAndNewlines)
-            // }
         } else if url != "" {
             (title, markdown) = markdownify(url: url, read: readability)
-            // if onlyOutputTitle {
-            //     if let title = get_title(html: nil, url: url) {
-            //         output = title.trimmingCharacters(in: .whitespacesAndNewlines)
-            //     }
-            // } else {
-            //     output = markdownify(url: url, read: readability).trimmingCharacters(in: .whitespacesAndNewlines)
-            // }
         } else {
             throw CleanExit.helpRequest()
         }
@@ -445,15 +459,25 @@ struct Gather: ParsableCommand {
         }
 
         if output != nil {
-            if nvUrl || nvAdd {
+            if nvuUrl || nvuAdd {
                 output = createNvUltraURL(markdown: markdown, title: title, notebook: nvNotebook)
 
-                if nvAdd {
+                if nvuAdd {
                     let url = URL(string: output!)!
                     if NSWorkspace.shared.open(url) {
                         throw CleanExit.message("Added to nvUltra")
                     }
                     throw ValidationError("Error adding to nvUltra")
+                }
+            } else if nvUrl || nvAdd {
+                output = createNvURL(markdown: markdown, title: title)
+
+                if nvAdd {
+                    let url = URL(string: output!)!
+                    if NSWorkspace.shared.open(url) {
+                        throw CleanExit.message("Added to NV/nvALT")
+                    }
+                    throw ValidationError("Error adding to NV/nvALT")
                 }
             }
 

@@ -117,3 +117,15 @@ Comments can often be fruitful (and important) to an answer, but they also get m
 
 Lastly, sometimes there's more than one good answer worth saving, but a bunch of zero-vote errors in judgement you don't need in your notes. Use `--min-upvotes X` to filter answers by a minimum number of upvotes. For example, `--min-upvotes 60` would easily weed out the less-desirable answers on an older question. Filtering by upvotes does not affect the accepted answer, if that exists it's included no matter how many upvotes is has (or doesn't have).
 
+#### nvUltra Options
+
+If you're running nvUltra, you can output clipped web pages directly to a notebook.
+
+`--nv-url` will generate a x-nvultra://make url that, when opened, will add the markdown version of the web page as a note, titled with the page title. This flag simply outputs the url (or copies it with `--copy`) and can be used as part of another script that handles the link.
+
+`--nv-add` will immediately open the url and add your note to nvUltra.
+
+You can include a `--nv-notebook PATH` option to specify which notebook the note gets added to. If this is left out, the note will be added to the frontmost open notebook in nvUltra.
+
+[Here's a Shortcut](https://github.com/ttscoff/gather-cli/raw/main/extras/Gather%20to%20nvUltra.shortcut) that accepts text or URLs and runs `gather --nv-add` on them. I trigger it with LaunchBar to send the current page from my browser straight to nvUltra.
+
