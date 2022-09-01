@@ -126,7 +126,7 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
                 if titleFallback.isEmpty {
                     meta += "title: Clipped on \(date)"
                 } else {
-                    meta += "title: \(titleFallback.replacingOccurrences(of: #"%date"#, with: date, options: .regularExpression))"
+                    meta += "title: \(titleFallback.replacingOccurrences(of: #"%date"#, with: date, options: [.regularExpression, .caseInsensitive]))"
                 }
             }
 
@@ -204,7 +204,14 @@ func urlEncodeQuery(string: String) -> String {
 }
 
 func sanitizeFile(name: String, replacement: String?) -> String {
-    return name.replacingOccurrences(of: #"[/?<>\\:*|\"]"#, with: replacement ?? "", options: .regularExpression)
+    return name.replacingOccurrences(of: #"[/?<>\\:*|\"\[\]]"#, with: replacement ?? "", options: .regularExpression)
+}
+
+func slugifyFile(name: String) -> String {
+    var slug = name.trimmingCharacters(in: .whitespacesAndNewlines)
+    slug = slug.replacingOccurrences(of: #"[^a-z0-9]"#, with: "-", options: [.regularExpression, .caseInsensitive])
+    slug = slug.replacingOccurrences(of: #"-+"#, with: "-", options: .regularExpression)
+    return slug.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
 }
 
 func createUrlScheme(template: String, markdown: String, title: String?, notebook: String?, source: String?) -> String {
@@ -212,13 +219,13 @@ func createUrlScheme(template: String, markdown: String, title: String?, noteboo
     if title != nil {
         note_title = title!
     }
-    var url = template.replacingOccurrences(of: #"%title"#, with: urlEncodeQuery(string: note_title), options: .regularExpression)
-    url = url.replacingOccurrences(of: #"%text"#, with: urlEncodeQuery(string: markdown), options: .regularExpression)
-    url = url.replacingOccurrences(of: #"%notebook"#, with: urlEncodeQuery(string: notebook ?? ""), options: .regularExpression)
-    url = url.replacingOccurrences(of: #"%source"#, with: urlEncodeQuery(string: source ?? ""), options: .regularExpression)
-    url = url.replacingOccurrences(of: #"%date"#, with: urlEncodeQuery(string: iso_datetime()), options: .regularExpression)
-    url = url.replacingOccurrences(of: #"%filename"#, with: urlEncodeQuery(string: sanitizeFile(name: note_title, replacement: " ")), options: .regularExpression)
-
+    var url = template.replacingOccurrences(of: #"%title"#, with: urlEncodeQuery(string: note_title), options: [.regularExpression, .caseInsensitive])
+    url = url.replacingOccurrences(of: #"%text"#, with: urlEncodeQuery(string: markdown), options: [.regularExpression, .caseInsensitive])
+    url = url.replacingOccurrences(of: #"%notebook"#, with: urlEncodeQuery(string: notebook ?? ""), options: [.regularExpression, .caseInsensitive])
+    url = url.replacingOccurrences(of: #"%source"#, with: urlEncodeQuery(string: source ?? ""), options: [.regularExpression, .caseInsensitive])
+    url = url.replacingOccurrences(of: #"%date"#, with: urlEncodeQuery(string: iso_datetime()), options: [.regularExpression, .caseInsensitive])
+    url = url.replacingOccurrences(of: #"%filename"#, with: urlEncodeQuery(string: sanitizeFile(name: note_title, replacement: " ")), options: [.regularExpression, .caseInsensitive])
+    url = url.replacingOccurrences(of: #"%slug"#, with: urlEncodeQuery(string: slugifyFile(name: note_title)), options: [.regularExpression, .caseInsensitive])
     return url
 }
 
@@ -269,12 +276,18 @@ func writeToClipboard(string: String) {
     print("Content in clipboard")
 }
 
-func writeToFile(filename: String, content: String) {
+func writeToFile(filename: String, content: String, title: String?) {
+    var newname = filename.replacingOccurrences(of: #"%date"#, with: iso_datetime(), options: [.regularExpression, .caseInsensitive])
+    newname = newname.replacingOccurrences(of: #"%slugdate"#, with: slugifyFile(name: iso_datetime()), options: [.regularExpression, .caseInsensitive])
+    if title != nil {
+        newname = newname.replacingOccurrences(of: #"%title"#, with: sanitizeFile(name: title!, replacement: "-"), options: [.regularExpression, .caseInsensitive])
+        newname = newname.replacingOccurrences(of: #"%slug"#, with: slugifyFile(name: title!), options: [.regularExpression, .caseInsensitive])
+    }
     do {
-        try content.write(to: URL(fileURLWithPath: filename), atomically: true, encoding: String.Encoding.utf8)
-        print("Saved to file: \(filename)")
+        try content.write(to: URL(fileURLWithPath: newname), atomically: true, encoding: String.Encoding.utf8)
+        print("Saved to file: \(newname)")
     } catch let error as NSError {
-        print("Failed writing to file: \(filename), Error: " + error.localizedDescription)
+        print("Failed writing to file: \(newname), Error: " + error.localizedDescription)
     }
 }
 
@@ -479,7 +492,7 @@ struct Gather: ParsableCommand {
             if titleFallback.isEmpty {
                 title = "Clipped Page \(iso_datetime())"
             } else {
-                title = titleFallback.replacingOccurrences(of: #"%date"#, with: urlEncodeQuery(string: iso_datetime()), options: .regularExpression)
+                title = titleFallback.replacingOccurrences(of: #"%date"#, with: urlEncodeQuery(string: iso_datetime()), options: [.regularExpression, .caseInsensitive])
             }
         }
 
@@ -536,7 +549,7 @@ struct Gather: ParsableCommand {
                 if copy {
                     throw ValidationError("error: --copy cannot be used with --file")
                 }
-                writeToFile(filename: file, content: output!)
+                writeToFile(filename: file, content: output!, title: title)
             } else {
                 print(output!)
             }
