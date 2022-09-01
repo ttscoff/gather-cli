@@ -1,3 +1,9 @@
+## 2.0.31
+
+#### IMPROVED
+
+- Add %filename placeholder to url templates, which inserts a sanitized version of the page title
+
 ## 2.0.30
 
 #### NEW
