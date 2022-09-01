@@ -192,7 +192,9 @@ func markdownify(url: String?, read: Bool?) -> (String?, String) {
 }
 
 func urlEncodeQuery(string: String) -> String {
-    return NSString(string: string).addingPercentEncoding(withAllowedCharacters: NSCharacterSet.urlQueryAllowed)!
+    // Percent encode all characters, even query-safe ones.
+    // Query-safe characters were still occasionally creating unparseable urls.
+    return NSString(string: string).addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: ""))!
 }
 
 func createUrlScheme(template: String, markdown: String, title: String?, notebook: String?) -> String {
@@ -223,32 +225,6 @@ func createUrlScheme(template: String, markdown: String, title: String?, noteboo
 //         URLQueryItem(name: "txt", value: markdown),
 //         URLQueryItem(name: "title", value: note_title),
 //         URLQueryItem(name: "notebook", value: notebook),
-//     ]
-
-//     return components.string ?? ""
-// }
-
-// func createNvURL(markdown: String?, title: String?) -> String {
-//     var note_title = ""
-
-//     if title == nil {
-//         if titleFallback.isEmpty {
-//             note_title = "Clipped Page \(iso_datetime())"
-//         } else {
-//             note_title = titleFallback.replacingOccurrences(of: #"%date"#, with: urlEncodeQuery(string: iso_datetime()), options: .regularExpression)
-//         }
-//     } else {
-//         note_title = title!
-//     }
-
-//     var components = URLComponents()
-//     components.scheme = "nv"
-//     components.host = "make"
-//     components.path = "/"
-
-//     components.queryItems = [
-//         URLQueryItem(name: "txt", value: markdown),
-//         URLQueryItem(name: "title", value: note_title),
 //     ]
 
 //     return components.string ?? ""
@@ -501,24 +477,29 @@ struct Gather: ParsableCommand {
 
         if output != nil {
             if nvuUrl || nvuAdd {
-                output = createUrlScheme(template: "nvultra://make?txt=%text&title=%title&notebook=%notebook", markdown: markdown, title: title, notebook: nvuNotebook)
+                output = createUrlScheme(template: "x-nvultra://make/?txt=%text&title=%title&notebook=%notebook", markdown: markdown, title: title, notebook: nvuNotebook)
 
                 if nvuAdd || urlOpen {
-                    let url = URL(string: output!)!
-                    if NSWorkspace.shared.open(url) {
-                        throw CleanExit.message("Added to nvUltra")
+                    let url = URL(string: output!)
+
+                    if url == nil {
+                        throw CleanExit.message("Error parsing generated URL")
+                    } else {
+                        if NSWorkspace.shared.open(url!) {
+                            throw CleanExit.message("Added to nvUltra")
+                        }
+                        throw CleanExit.message("Error adding to nvUltra")
                     }
-                    throw ValidationError("Error adding to nvUltra")
                 }
             } else if nvUrl || nvAdd {
-                output = createUrlScheme(template: "nv://make?txt=%text&title=%title", markdown: markdown, title: title, notebook: nvuNotebook)
+                output = createUrlScheme(template: "nv://make/?txt=%text&title=%title", markdown: markdown, title: title, notebook: nvuNotebook)
 
                 if nvAdd || urlOpen {
                     let url = URL(string: output!)!
                     if NSWorkspace.shared.open(url) {
                         throw CleanExit.message("Added to NV/nvALT")
                     }
-                    throw ValidationError("Error adding to NV/nvALT")
+                    throw CleanExit.message("Error adding to NV/nvALT")
                 }
             } else if !urlTemplate.isEmpty {
                 output = createUrlScheme(template: urlTemplate, markdown: markdown, title: title, notebook: nvuNotebook)
@@ -528,7 +509,7 @@ struct Gather: ParsableCommand {
                     if NSWorkspace.shared.open(url) {
                         throw CleanExit.message("Opened URL")
                     }
-                    throw ValidationError("Error opening URL")
+                    throw CleanExit.message("Error opening URL")
                 }
             }
 
