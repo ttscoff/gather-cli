@@ -1,3 +1,9 @@
+## 2.0.32
+
+#### IMPROVED
+
+- Rely more heavily on title tags instead of trying to parse h1/h2 effectively
+
 ## 2.0.31
 
 #### IMPROVED

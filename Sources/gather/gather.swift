@@ -4,7 +4,7 @@ import Cocoa
 import Foundation
 import HTML2Text
 import Readability
-var VERSION = "2.0.31"
+var VERSION = "2.0.32"
 
 var acceptedAnswerOnly = false
 var disableReadability = false
