@@ -12,6 +12,7 @@ var escapeSpecial = false
 var grafLinks = true
 var includeAnswerComments = false
 var includeMetadata = false
+var fallbackTitle = ""
 var includeSourceLink = true
 var includeTitleAsH1 = true
 var onlyOutputTitle = false
@@ -118,7 +119,11 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
             if title != nil {
                 meta += "title: \"\(title!)\""
             } else {
-                meta += "title: Clipped on \(date)"
+                if fallbackTitle.isEmpty {
+                    meta += "title: Clipped on \(date)"
+                } else {
+                    meta += "title: \(fallbackTitle.replacingOccurrences(of: #"%date"#, with: date, options: .regularExpression))"
+                }
             }
 
             if url != nil {
@@ -186,50 +191,68 @@ func markdownify(url: String?, read: Bool?) -> (String?, String) {
     return markdownify_html(html: html, read: read, url: url, baseurl: baseurl)
 }
 
-func createNvUltraURL(markdown: String?, title: String?, notebook: String?) -> String {
-    var note_title = ""
-
-    if title == nil {
-        note_title = "\(iso_datetime()) Clipped Note"
-    } else {
-        note_title = title!
-    }
-
-    var components = URLComponents()
-    components.scheme = "x-nvultra"
-    components.host = "make"
-    components.path = "/"
-
-    components.queryItems = [
-        URLQueryItem(name: "txt", value: markdown),
-        URLQueryItem(name: "title", value: note_title),
-        URLQueryItem(name: "notebook", value: notebook),
-    ]
-
-    return components.string ?? ""
+func urlEncodeQuery(string: String) -> String {
+    return NSString(string: string).addingPercentEncoding(withAllowedCharacters: NSCharacterSet.urlQueryAllowed)!
 }
 
-func createNvURL(markdown: String?, title: String?) -> String {
+func createUrlScheme(template: String, markdown: String, title: String?, notebook: String?) -> String {
     var note_title = ""
-
-    if title == nil {
-        note_title = "\(iso_datetime()) Clipped Note"
-    } else {
+    if title != nil {
         note_title = title!
     }
+    var url = template.replacingOccurrences(of: #"%title"#, with: urlEncodeQuery(string: note_title), options: .regularExpression)
+    url = url.replacingOccurrences(of: #"%text"#, with: urlEncodeQuery(string: markdown), options: .regularExpression)
+    url = url.replacingOccurrences(of: #"%notebook"#, with: urlEncodeQuery(string: notebook ?? ""), options: .regularExpression)
 
-    var components = URLComponents()
-    components.scheme = "nv"
-    components.host = "make"
-    components.path = "/"
-
-    components.queryItems = [
-        URLQueryItem(name: "txt", value: markdown),
-        URLQueryItem(name: "title", value: note_title),
-    ]
-
-    return components.string ?? ""
+    return url
 }
+
+// func createNvUltraURL(markdown: String?, title: String?, notebook: String?) -> String {
+//     var note_title = ""
+
+//     if title != nil {
+//         note_title = title!
+//     }
+
+//     var components = URLComponents()
+//     components.scheme = "x-nvultra"
+//     components.host = "make"
+//     components.path = "/"
+
+//     components.queryItems = [
+//         URLQueryItem(name: "txt", value: markdown),
+//         URLQueryItem(name: "title", value: note_title),
+//         URLQueryItem(name: "notebook", value: notebook),
+//     ]
+
+//     return components.string ?? ""
+// }
+
+// func createNvURL(markdown: String?, title: String?) -> String {
+//     var note_title = ""
+
+//     if title == nil {
+//         if fallbackTitle.isEmpty {
+//             note_title = "Clipped Page \(iso_datetime())"
+//         } else {
+//             note_title = fallbackTitle.replacingOccurrences(of: #"%date"#, with: urlEncodeQuery(string: iso_datetime()), options: .regularExpression)
+//         }
+//     } else {
+//         note_title = title!
+//     }
+
+//     var components = URLComponents()
+//     components.scheme = "nv"
+//     components.host = "make"
+//     components.path = "/"
+
+//     components.queryItems = [
+//         URLQueryItem(name: "txt", value: markdown),
+//         URLQueryItem(name: "title", value: note_title),
+//     ]
+
+//     return components.string ?? ""
+// }
 
 func readFromClipboard(html: Bool = false) -> String? {
     let pasteboard = NSPasteboard.general
@@ -362,6 +385,15 @@ struct Gather: ParsableCommand {
     @Option(help: "Specify an nvUltra notebook for the 'make' URL")
     var nvuNotebook: String = ""
 
+    @Option(help: "Create a URL scheme from a template using %title and %text")
+    var urlTemplate: String = ""
+
+    @Option(help: "Fallback title to use if no title is found, accepts %date")
+    var fallbackTitle: String = ""
+
+    @Flag(help: "Open URL created from template")
+    var urlOpen = false
+
     @Flag(name: .shortAndLong, help: "Display current version number")
     var version = false
 
@@ -452,6 +484,14 @@ struct Gather: ParsableCommand {
             throw CleanExit.helpRequest()
         }
 
+        if title == nil || title!.isEmpty {
+            if fallbackTitle.isEmpty {
+                title = "Clipped Page \(iso_datetime())"
+            } else {
+                title = fallbackTitle.replacingOccurrences(of: #"%date"#, with: urlEncodeQuery(string: iso_datetime()), options: .regularExpression)
+            }
+        }
+
         if onlyOutputTitle {
             output = title!.trimmingCharacters(in: .whitespacesAndNewlines)
         } else {
@@ -460,9 +500,9 @@ struct Gather: ParsableCommand {
 
         if output != nil {
             if nvuUrl || nvuAdd {
-                output = createNvUltraURL(markdown: markdown, title: title, notebook: nvuNotebook)
+                output = createUrlScheme(template: "nvultra://make?txt=%text&title=%title&notebook=%notebook", markdown: markdown, title: title, notebook: nvuNotebook)
 
-                if nvuAdd {
+                if nvuAdd || urlOpen {
                     let url = URL(string: output!)!
                     if NSWorkspace.shared.open(url) {
                         throw CleanExit.message("Added to nvUltra")
@@ -470,14 +510,24 @@ struct Gather: ParsableCommand {
                     throw ValidationError("Error adding to nvUltra")
                 }
             } else if nvUrl || nvAdd {
-                output = createNvURL(markdown: markdown, title: title)
+                output = createUrlScheme(template: "nv://make?txt=%text&title=%title", markdown: markdown, title: title, notebook: nvuNotebook)
 
-                if nvAdd {
+                if nvAdd || urlOpen {
                     let url = URL(string: output!)!
                     if NSWorkspace.shared.open(url) {
                         throw CleanExit.message("Added to NV/nvALT")
                     }
                     throw ValidationError("Error adding to NV/nvALT")
+                }
+            } else if !urlTemplate.isEmpty {
+                output = createUrlScheme(template: urlTemplate, markdown: markdown, title: title, notebook: nvuNotebook)
+
+                if urlOpen {
+                    let url = URL(string: output!)!
+                    if NSWorkspace.shared.open(url) {
+                        throw CleanExit.message("Opened URL")
+                    }
+                    throw ValidationError("Error opening URL")
                 }
             }
 
