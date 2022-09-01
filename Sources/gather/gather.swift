@@ -12,7 +12,7 @@ var escapeSpecial = false
 var grafLinks = true
 var includeAnswerComments = false
 var includeMetadata = false
-var fallbackTitle = ""
+var titleFallback = ""
 var includeSourceLink = true
 var includeTitleAsH1 = true
 var onlyOutputTitle = false
@@ -119,10 +119,10 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
             if title != nil {
                 meta += "title: \"\(title!)\""
             } else {
-                if fallbackTitle.isEmpty {
+                if titleFallback.isEmpty {
                     meta += "title: Clipped on \(date)"
                 } else {
-                    meta += "title: \(fallbackTitle.replacingOccurrences(of: #"%date"#, with: date, options: .regularExpression))"
+                    meta += "title: \(titleFallback.replacingOccurrences(of: #"%date"#, with: date, options: .regularExpression))"
                 }
             }
 
@@ -232,10 +232,10 @@ func createUrlScheme(template: String, markdown: String, title: String?, noteboo
 //     var note_title = ""
 
 //     if title == nil {
-//         if fallbackTitle.isEmpty {
+//         if titleFallback.isEmpty {
 //             note_title = "Clipped Page \(iso_datetime())"
 //         } else {
-//             note_title = fallbackTitle.replacingOccurrences(of: #"%date"#, with: urlEncodeQuery(string: iso_datetime()), options: .regularExpression)
+//             note_title = titleFallback.replacingOccurrences(of: #"%date"#, with: urlEncodeQuery(string: iso_datetime()), options: .regularExpression)
 //         }
 //     } else {
 //         note_title = title!
@@ -424,6 +424,7 @@ struct Gather: ParsableCommand {
         onlyOutputTitle = titleOnly
         includeMetadata = metadata
         includeSourceLink = includeSource
+        titleFallback = fallbackTitle
         // escapeSpecial = escape
         // wrapWidth = wrap
 
@@ -485,10 +486,10 @@ struct Gather: ParsableCommand {
         }
 
         if title == nil || title!.isEmpty {
-            if fallbackTitle.isEmpty {
+            if titleFallback.isEmpty {
                 title = "Clipped Page \(iso_datetime())"
             } else {
-                title = fallbackTitle.replacingOccurrences(of: #"%date"#, with: urlEncodeQuery(string: iso_datetime()), options: .regularExpression)
+                title = titleFallback.replacingOccurrences(of: #"%date"#, with: urlEncodeQuery(string: iso_datetime()), options: .regularExpression)
             }
         }
 
