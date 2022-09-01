@@ -62,33 +62,37 @@ func iso_datetime() -> String {
     return dateFormatterPrint.string(from: Date())
 }
 
-func markdownify_input(html: String?, read: Bool?) -> (String?, String) {
+func markdownify_input(html: String?, read: Bool?) -> (String?, String, String?) {
     let read = read
     return markdownify_html(html: html, read: read, url: nil)
 }
 
-func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String? = "") -> (String?, String) {
+func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String? = "") -> (String?, String, String?) {
     var html = html
     var title = String?(nil)
+    var sourceUrl = url
 
     if html != nil {
-        if read != false {
-            do {
-                let readability = Readability(html: html!)
-                readability.allSpecialHandling = true
-                readability.acceptedAnswerOnly = acceptedAnswerOnly
-                readability.includeAnswerComments = includeAnswerComments
-                readability.minimumAnswerUpvotes = minimumAnswerUpvotes
-                let started = readability.start()
+        do {
+            let readability = Readability(html: html!)
+            readability.allSpecialHandling = true
+            readability.acceptedAnswerOnly = acceptedAnswerOnly
+            readability.includeAnswerComments = includeAnswerComments
+            readability.minimumAnswerUpvotes = minimumAnswerUpvotes
+            let started = readability.start()
 
-                if started {
+            if started {
+                sourceUrl = readability.canonical
+                title = try readability.getTitle()?.text()
+                if read != false {
                     html = try readability.getContent()!.html()
                     html = html!.trimmingCharacters(in: .whitespacesAndNewlines)
-                    title = try readability.getTitle()?.text()
                 }
+            }
 
-            } catch {
-                print("Error parsing readability, trying without")
+        } catch {
+            print("Error parsing readability, trying without")
+            if read != false {
                 return markdownify_html(html: html, read: false, url: url, baseurl: baseurl)
             }
         }
@@ -126,48 +130,50 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
                 }
             }
 
-            if url != nil {
-                meta += "\nsource: \(url!)"
+            if sourceUrl != nil {
+                meta += "\nsource: \(sourceUrl!)"
             }
 
             meta += "\ndate: \(date)"
             meta += "\n\n"
         }
 
-        if includeSourceLink, url != nil {
+        if includeSourceLink, sourceUrl != nil {
             if title != nil {
                 if includeTitleAsH1 {
-                    source = "# \(title!)\n\n[Source](\(url!) \"\(title!)\")\n\n"
+                    source = "# \(title!)\n\n[Source](\(sourceUrl!) \"\(title!)\")\n\n"
                 } else {
-                    source = "[Source](\(url!) \"\(title!)\")\n\n"
+                    source = "[Source](\(sourceUrl!) \"\(title!)\")\n\n"
                 }
             } else {
-                source = "[Source](\(url!))\n\n"
+                source = "[Source](\(sourceUrl!))\n\n"
             }
+        } else if url == nil, title != nil {
+            source = "# \(title!)\n\n"
         }
 
         html = "\(meta)\(source)\(html!)"
 
-        return (title, html!)
+        return (title, html!, sourceUrl)
     }
 
-    return (title, "")
+    return (title, "", url)
 }
 
-func markdownify(url: String?, read: Bool?) -> (String?, String) {
+func markdownify(url: String?, read: Bool?) -> (String?, String, String?) {
     var url = url
     var html = String?(nil)
     var baseurl = url
 
     if url == nil, html == nil {
-        return (nil, "No valid url, html or text was provided.")
+        return (nil, "No valid url, html or text was provided.", nil)
     }
 
     if url != nil {
         let u = url!.replacingOccurrences(of: "[?&]utm_[^#]+", with: "", options: .regularExpression)
         guard let base = URL(string: u) else {
             exitWithError(error: 1, message: "error: invalid URL")
-            return (nil, "")
+            return (nil, "", nil)
         }
 
         let scheme = base.scheme
@@ -181,7 +187,7 @@ func markdownify(url: String?, read: Bool?) -> (String?, String) {
         }
 
         guard let page = try? String(contentsOf: URL(string: u)!, encoding: .utf8) else {
-            return (nil, "")
+            return (nil, "", nil)
         }
 
         html = page
@@ -197,7 +203,7 @@ func urlEncodeQuery(string: String) -> String {
     return NSString(string: string).addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: ""))!
 }
 
-func createUrlScheme(template: String, markdown: String, title: String?, notebook: String?) -> String {
+func createUrlScheme(template: String, markdown: String, title: String?, notebook: String?, source: String?) -> String {
     var note_title = ""
     if title != nil {
         note_title = title!
@@ -205,6 +211,7 @@ func createUrlScheme(template: String, markdown: String, title: String?, noteboo
     var url = template.replacingOccurrences(of: #"%title"#, with: urlEncodeQuery(string: note_title), options: .regularExpression)
     url = url.replacingOccurrences(of: #"%text"#, with: urlEncodeQuery(string: markdown), options: .regularExpression)
     url = url.replacingOccurrences(of: #"%notebook"#, with: urlEncodeQuery(string: notebook ?? ""), options: .regularExpression)
+    url = url.replacingOccurrences(of: #"%source"#, with: urlEncodeQuery(string: source ?? ""), options: .regularExpression)
 
     return url
 }
@@ -361,7 +368,7 @@ struct Gather: ParsableCommand {
     @Option(help: "Specify an nvUltra notebook for the 'make' URL")
     var nvuNotebook: String = ""
 
-    @Option(help: "Create a URL scheme from a template using %title and %text")
+    @Option(help: "Create a URL scheme from a template using %title, %text, and %source")
     var urlTemplate: String = ""
 
     @Option(help: "Fallback title to use if no title is found, accepts %date")
@@ -452,11 +459,12 @@ struct Gather: ParsableCommand {
         var output: String?
         var title: String?
         var markdown: String
+        var sourceUrl: String?
 
         if input != nil {
-            (title, markdown) = markdownify_input(html: input, read: readability)
+            (title, markdown, sourceUrl) = markdownify_input(html: input, read: readability)
         } else if url != "" {
-            (title, markdown) = markdownify(url: url, read: readability)
+            (title, markdown, sourceUrl) = markdownify(url: url, read: readability)
         } else {
             throw CleanExit.helpRequest()
         }
@@ -477,7 +485,7 @@ struct Gather: ParsableCommand {
 
         if output != nil {
             if nvuUrl || nvuAdd {
-                output = createUrlScheme(template: "x-nvultra://make/?txt=%text&title=%title&notebook=%notebook", markdown: markdown, title: title, notebook: nvuNotebook)
+                output = createUrlScheme(template: "x-nvultra://make/?txt=%text&title=%title&notebook=%notebook", markdown: markdown, title: title, notebook: nvuNotebook, source: sourceUrl)
 
                 if nvuAdd || urlOpen {
                     let url = URL(string: output!)
@@ -492,7 +500,7 @@ struct Gather: ParsableCommand {
                     }
                 }
             } else if nvUrl || nvAdd {
-                output = createUrlScheme(template: "nv://make/?txt=%text&title=%title", markdown: markdown, title: title, notebook: nvuNotebook)
+                output = createUrlScheme(template: "nv://make/?txt=%text&title=%title", markdown: markdown, title: title, notebook: nvuNotebook, source: sourceUrl)
 
                 if nvAdd || urlOpen {
                     let url = URL(string: output!)!
@@ -502,7 +510,7 @@ struct Gather: ParsableCommand {
                     throw CleanExit.message("Error adding to NV/nvALT")
                 }
             } else if !urlTemplate.isEmpty {
-                output = createUrlScheme(template: urlTemplate, markdown: markdown, title: title, notebook: nvuNotebook)
+                output = createUrlScheme(template: urlTemplate, markdown: markdown, title: title, notebook: nvuNotebook, source: sourceUrl)
 
                 if urlOpen {
                     let url = URL(string: output!)!
