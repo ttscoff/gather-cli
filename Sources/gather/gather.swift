@@ -203,6 +203,10 @@ func urlEncodeQuery(string: String) -> String {
     return NSString(string: string).addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: ""))!
 }
 
+func sanitizeFile(name: String, replacement: String?) -> String {
+    return name.replacingOccurrences(of: #"[/?<>\\:*|\"]"#, with: replacement ?? "", options: .regularExpression)
+}
+
 func createUrlScheme(template: String, markdown: String, title: String?, notebook: String?, source: String?) -> String {
     var note_title = ""
     if title != nil {
@@ -212,6 +216,8 @@ func createUrlScheme(template: String, markdown: String, title: String?, noteboo
     url = url.replacingOccurrences(of: #"%text"#, with: urlEncodeQuery(string: markdown), options: .regularExpression)
     url = url.replacingOccurrences(of: #"%notebook"#, with: urlEncodeQuery(string: notebook ?? ""), options: .regularExpression)
     url = url.replacingOccurrences(of: #"%source"#, with: urlEncodeQuery(string: source ?? ""), options: .regularExpression)
+    url = url.replacingOccurrences(of: #"%date"#, with: urlEncodeQuery(string: iso_datetime()), options: .regularExpression)
+    url = url.replacingOccurrences(of: #"%filename"#, with: urlEncodeQuery(string: sanitizeFile(name: note_title, replacement: " ")), options: .regularExpression)
 
     return url
 }
@@ -485,7 +491,7 @@ struct Gather: ParsableCommand {
 
         if output != nil {
             if nvuUrl || nvuAdd {
-                output = createUrlScheme(template: "x-nvultra://make/?txt=%text&title=%title&notebook=%notebook", markdown: markdown, title: title, notebook: nvuNotebook, source: sourceUrl)
+                output = createUrlScheme(template: "x-nvultra://make/?txt=%text&title=%filename&notebook=%notebook", markdown: markdown, title: title, notebook: nvuNotebook, source: sourceUrl)
 
                 if nvuAdd || urlOpen {
                     let url = URL(string: output!)
