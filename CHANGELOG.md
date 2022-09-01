@@ -1,3 +1,23 @@
+## 2.0.30
+
+#### NEW
+
+- Generate any url scheme using templates (`--url-template "handler://method?txt=%text&title=%title"`)
+- Open generated urls automatically with `--url-open`
+- Define a fallback title for various outputs in case one isn't found (usually in HTML snippets) `--fallback-title`
+
+#### IMPROVED
+
+- Better title detection for HTML snippets
+- If a title can be detected from an HTML snippet, include it if requested
+- If a canonical link can be found for the page, use it as the "source url" in output
+
+#### FIXED
+
+- Crash when HTML snippet is missing head
+- URL encode ALL characters to avoid malformed url handlers
+- Images wrapped in links missing opening bracket
+
 ## 2.0.29
 
 #### CHANGED

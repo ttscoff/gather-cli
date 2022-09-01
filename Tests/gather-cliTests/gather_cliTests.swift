@@ -2,11 +2,37 @@ import class Foundation.Bundle
 import XCTest
 
 final class gather_cliTests: XCTestCase {
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
+    func testMetadata() throws {
+        guard #available(macOS 10.13, *) else {
+            return
+        }
 
+        // Mac Catalyst won't have `Process`, but it is supported for executables.
+        #if !targetEnvironment(macCatalyst)
+
+            let fooBinary = productsDirectory.appendingPathComponent("gather")
+
+            let process = Process()
+            process.executableURL = fooBinary
+
+            let args = ["--metadata", "https://github.com/vimtaai/critic-markup?query=value&something=else#nowhere"]
+
+            let pipe = Pipe()
+            process.standardOutput = pipe
+
+            process.arguments = args
+            try process.run()
+            process.waitUntilExit()
+
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            let output = String(data: data, encoding: .utf8)
+
+            XCTAssertNotNil(output)
+            XCTAssertNotNil(output!.range(of: "source: https://github.com/vimtaai/critic-markup\n"))
+        #endif
+    }
+
+    func testStdin() throws {
         // Some of the APIs that we use below are available in macOS 10.13 and above.
         guard #available(macOS 10.13, *) else {
             return
