@@ -1,3 +1,14 @@
+## 2.0.33
+
+#### NEW
+
+- Use %date, %slugdate, %title, and %slug in --file paths
+- %slug for url scheme templates
+
+#### IMPROVED
+
+- Sanitize filenames where needed
+
 ## 2.0.32
 
 #### IMPROVED
