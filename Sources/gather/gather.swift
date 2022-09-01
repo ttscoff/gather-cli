@@ -211,7 +211,7 @@ func slugifyFile(name: String) -> String {
     var slug = name.trimmingCharacters(in: .whitespacesAndNewlines)
     slug = slug.replacingOccurrences(of: #"[^a-z0-9]"#, with: "-", options: [.regularExpression, .caseInsensitive])
     slug = slug.replacingOccurrences(of: #"-+"#, with: "-", options: .regularExpression)
-    return slug.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+    return slug.trimmingCharacters(in: CharacterSet.alphanumerics.inverted).lowercased()
 }
 
 func createUrlScheme(template: String, markdown: String, title: String?, notebook: String?, source: String?) -> String {
