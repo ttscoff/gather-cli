@@ -419,9 +419,6 @@ struct Gather: ParsableCommand {
         var input: String?
 
         if inlineLinks {
-            if paragraphLinks {
-                throw ValidationError("error: --inline cannot be used with --paragraph-links")
-            }
             inline = inlineLinks
         } else if paragraphLinks {
             if inline {

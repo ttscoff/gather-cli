@@ -121,7 +121,7 @@ If you add `--file PATH` to the command, the results will be saved to the path y
 
 You can control the formatting of the output in a couple of ways.
 
-By default Gather will use reference-style links, and will place the references directly after the paragraph where they occur. You can switch to inline links using `--inline`, and you can suppress the per-paragraph linking and collect them all at the end of the document using `--no-paragraph-links`.
+By default Gather will use reference-style links, and will place the references directly after the paragraph where they occur. You can switch to inline links using `--inline-link`, and you can suppress the per-paragraph linking and collect them all at the end of the document using `--no-paragraph-links`.
 
 By default Gather will maintain Unicode characters in the output. If you'd prefer to have an ASCII equivalent substituted, you can use `--no-unicode`. This feature may not be working properly yet.
 
