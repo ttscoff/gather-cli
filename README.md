@@ -177,3 +177,13 @@ To show nvUltra's url scheme in this manner:
 
 Add the `--url-open` flag to have the URL automatically executed instead of being returned.
 
+As an example, here's what Rand Anderson uses for Obsidian:
+
+The `--url-template`:
+
+    obsidian://new?vault=myvault&name=%filename&content=%text
+
+These are the other options he uses along with it:
+
+    --url-open --inline-links --no-paragraph-links --fallback-title 'webclip %date'
+
