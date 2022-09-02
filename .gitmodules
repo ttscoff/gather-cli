@@ -1,0 +1,6 @@
+[submodule "html2text-swift"]
+	path = html2text-swift
+	url = ./html2text-swift
+[submodule "read-swift"]
+	path = read-swift
+	url = ./read-swift

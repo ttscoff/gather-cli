@@ -7,8 +7,10 @@ let package = Package(
     name: "Gather",
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0"),
-        .package(url: "https://github.com/ttscoff/read-swift.git", branch: "master"),
-        .package(url: "https://github.com/ttscoff/html2text-swift.git", branch: "master"),
+        // .package(url: "https://github.com/ttscoff/read-swift.git", branch: "master"),
+        // .package(url: "https://github.com/ttscoff/html2text-swift.git", branch: "master"),
+        .package(path: "./read-swift"),
+        .package(path: "./html2text-swift"),
         .package(url: "https://github.com/ttscoff/SwiftSoup.git", from: "2.0.0"),
     ],
     targets: [

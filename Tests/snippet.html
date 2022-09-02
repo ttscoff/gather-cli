@@ -1,0 +1,26 @@
+<div class="instapaper_body e-content" role="main">
+    
+    
+    <p><a href="/2013/07/30/precise-web-clipping-to-markdown-with-bullseye/">Bullseye</a> has been updated with a couple of tweaks.</p>
+
+<p>First, pressing escape after running the bookmarklet will now cancel it and you can resume browsing without refreshing the page.</p>
+
+<p>Next, if you want to skip the Marky preview frame with copy button, you can make a quick edit to the bookmarklet at the very beginning, adding <code class="language-plaintext highlighter-rouge">window.bullseyeShowFrame=0;</code> after the <code class="language-plaintext highlighter-rouge">javascript:</code> and before the function:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight fixed copybutton"><code>javascript:window.bullseyeShowFrame=0;(function()...</code></pre><a class="copy_button">Copy</a></div></div>
+
+<p>I also made a couple of tweaks to the path builder to help with getting the raw source when it’s available.</p>
+
+<p>If you have the bookmarklet installed, it’s already updated. If you want to switch to getting raw Markdown text back, just make the above edit. If you haven’t installed it yet, just drag the link below to your bookmarks bar.</p>
+
+<div class="elWrapper">
+<a class="bookmarklet" href="javascript:(function(){var p=document.createElement(&quot;p&quot;);p.innerHTML=&quot;<strong>Loading…</strong>&quot;;p.id=&quot;loadingp&quot;;p.style.padding=&quot;20px&quot;;p.style.background=&quot;#fff&quot;;p.style.left=&quot;20px&quot;;p.style.top=0;p.style.position=&quot;fixed&quot;;p.style.zIndex=&quot;9999999&quot;;p.style.opacity=&quot;.85&quot;;document.body.appendChild(p);document.body.appendChild(document.createElement(&quot;script&quot;)).src=&quot;//d2z4mgf8zqkbu2.cloudfront.net/bookmarklets/bullseye.js?x=&quot;+(Math.random());})();">Bullseye</a>
+</div>
+
+<p>If you run into issues on a particular page, I’m happy to look at test cases. Just <a href="http://brettterpstra.com/contact/">shoot me an email</a>.</p>
+
+    
+    
+    
+    
+  </div>

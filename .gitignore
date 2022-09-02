@@ -12,3 +12,4 @@ build
 package
 .gitsecret/keys/random_seed
 !*.secret
+gather
