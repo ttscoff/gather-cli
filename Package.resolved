@@ -1,6 +1,24 @@
 {
   "pins" : [
     {
+      "identity" : "html2text-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ttscoff/html2text-swift.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "c25bf330f5a28d506afb374af9801b4849975666"
+      }
+    },
+    {
+      "identity" : "read-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ttscoff/read-swift.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "c0fef3d905cd9172525a8f2f5e42a651998752c7"
+      }
+    },
+    {
       "identity" : "swift-argument-parser",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser",
