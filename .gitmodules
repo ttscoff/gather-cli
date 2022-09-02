@@ -1,6 +1,0 @@
-[submodule "read-swift"]
-	path = read-swift
-	url = https://github.com/ttscoff/read-swift.git
-[submodule "html2text-swift"]
-	path = html2text-swift
-	url = https://github.com/ttscoff/html2text-swift.git
