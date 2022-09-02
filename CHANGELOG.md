@@ -5,16 +5,6 @@
 - Using --inline-links without --no-paragraph links would throw an error, which is just stupid. What was he thinking?
 - Documentation refers to `--inline` instead of `--inline-links` (Thanks rand)
 
-## 2.0.39
-
-## 2.0.38
-
-## 2.0.37
-
-## 2.0.36
-
-## 2.0.35
-
 ## 2.0.34
 
 #### IMPROVED
