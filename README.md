@@ -4,7 +4,7 @@
 ![Howzit banner image](https://cdn3.brettterpstra.com/uploads/2022/08/gatherheader-rb.webp)
 
 
-Current version: 2.0.39
+Current version: 2.0.40
 
 This project is the successor to read2text, which was a Python based tool that used Arc90 Readability and html2text to convert web URLs to Markdown documents, ready to store in your notes. It takes its name from another of my similar projects that I've since retired. It was this, but with a GUI, and this is infinitely more scriptable and is designed to nestle into your favorite tools and projects.
 
@@ -121,7 +121,7 @@ If you add `--file PATH` to the command, the results will be saved to the path y
 
 You can control the formatting of the output in a couple of ways.
 
-By default Gather will use reference-style links, and will place the references directly after the paragraph where they occur. You can switch to inline links using `--inline`, and you can suppress the per-paragraph linking and collect them all at the end of the document using `--no-paragraph-links`.
+By default Gather will use reference-style links, and will place the references directly after the paragraph where they occur. You can switch to inline links using `--inline-link`, and you can suppress the per-paragraph linking and collect them all at the end of the document using `--no-paragraph-links`.
 
 By default Gather will maintain Unicode characters in the output. If you'd prefer to have an ASCII equivalent substituted, you can use `--no-unicode`. This feature may not be working properly yet.
 

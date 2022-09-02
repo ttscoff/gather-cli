@@ -4,7 +4,7 @@ import Cocoa
 import Foundation
 import HTML2Text
 import Readability
-var VERSION = "2.0.39"
+var VERSION = "2.0.40"
 
 var acceptedAnswerOnly = false
 var disableReadability = false
@@ -419,12 +419,10 @@ struct Gather: ParsableCommand {
         var input: String?
 
         if inlineLinks {
+            grafLinks = false
             inline = inlineLinks
         } else if paragraphLinks {
-            if inline {
-                throw ValidationError("error: --inline cannot be used with --paragraph-links")
-            }
-
+            inline = false
             grafLinks = paragraphLinks
         }
 

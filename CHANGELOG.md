@@ -1,3 +1,10 @@
+## 2.0.40
+
+#### FIXED
+
+- Using --inline-links without --no-paragraph links would throw an error, which is just stupid. What was he thinking?
+- Documentation refers to `--inline` instead of `--inline-links` (Thanks rand)
+
 ## 2.0.39
 
 ## 2.0.38
