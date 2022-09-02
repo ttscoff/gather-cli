@@ -67,6 +67,17 @@ func markdownify_input(html: String?, read: Bool?) -> (String?, String, String?)
     return markdownify_html(html: html, read: read, url: nil)
 }
 
+func countH1s(_ s: String, title: String?) -> Int {
+    var pattern = "^# ."
+    if title != nil {
+        pattern = "^# \(NSRegularExpression.escapedPattern(for: title!))"
+    }
+
+    let re = try! NSRegularExpression(pattern: pattern, options: [.anchorsMatchLines, .caseInsensitive])
+    let checkRange = NSRange(s.startIndex ..< s.endIndex, in: s)
+    return re.matches(in: s, options: [], range: checkRange).count
+}
+
 func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String? = "") -> (String?, String, String?) {
     var html = html
     var title = String?(nil)
@@ -149,9 +160,11 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
                 source = "[Source](\(sourceUrl!))\n\n"
             }
         } else if url == nil, title != nil {
-            source = "# \(title!)\n\n"
+            if includeTitleAsH1, countH1s(html!, title: title) == 0 {
+                source = "# \(title!)\n\n"
+            }
+            // source = "# \(title!)\n\n"
         }
-
         html = "\(meta)\(source)\(html!)"
 
         return (title, html!, sourceUrl)
