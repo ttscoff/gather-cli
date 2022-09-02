@@ -4,7 +4,7 @@ import Cocoa
 import Foundation
 import HTML2Text
 import Readability
-var VERSION = "2.0.33"
+var VERSION = "2.0.34"
 
 var acceptedAnswerOnly = false
 var disableReadability = false
@@ -337,7 +337,7 @@ struct Gather: ParsableCommand {
     // @Flag(help: "Escape special characters")
     // var escape = false
 
-    @Option(name: .shortAndLong, help: "Save output to file path", completion: .file())
+    @Option(name: .shortAndLong, help: "Save output to file path. Accepts %date, %slugdate, %title, and %slug", completion: .file())
     var file: String = ""
 
     @Flag(help: "Expect raw HTML instead of a URL")
@@ -400,7 +400,7 @@ struct Gather: ParsableCommand {
     @Option(help: "Specify an nvUltra notebook for the 'make' URL")
     var nvuNotebook: String = ""
 
-    @Option(help: "Create a URL scheme from a template using %title, %text, and %source")
+    @Option(help: "Create a URL scheme from a template using %title, %text, %notebook, %source, %date, %filename, and %slug")
     var urlTemplate: String = ""
 
     @Option(help: "Fallback title to use if no title is found, accepts %date")

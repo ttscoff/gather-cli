@@ -55,7 +55,7 @@ final class gather_cliTests: XCTestCase {
         let args = ["--title-only", "https://github.com/vimtaai/critic-markup"]
         let output = gatherWith(args: args, stdin: nil)
         XCTAssertNotNil(output)
-        XCTAssertEqual(output!, "vimtaai/critic-markup\n")
+        XCTAssertEqual(output!, "GitHub - vimtaai/critic-markup: CriticMarkup in JavaScript\n")
     }
 
     func testMetadata() throws {

@@ -1,3 +1,10 @@
+## 2.0.34
+
+#### FIXED
+
+- Double h1 headlines being inserted
+- Respect --no-include-title better
+
 ## 2.0.33
 
 #### NEW

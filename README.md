@@ -4,7 +4,7 @@
 ![Howzit banner image](https://cdn3.brettterpstra.com/uploads/2022/08/gatherheader-rb.webp)
 
 
-Current version: 2.0.33
+Current version: 2.0.34
 
 This project is the successor to read2text, which was a Python based tool that used Arc90 Readability and html2text to convert web URLs to Markdown documents, ready to store in your notes. It takes its name from another of my similar projects that I've since retired. It was this, but with a GUI, and this is infinitely more scriptable and is designed to nestle into your favorite tools and projects.
 
@@ -16,12 +16,16 @@ The code is available [on GitHub](https://github.com/ttscoff/gather-cli). It's b
 
 #### Via Homebrew
 
-The easiest way to install Gather is with [Homebrew](https://brew.sh):
+The easiest way to install Gather is with [Homebrew](https://brew.sh). Homebrew requires installing Xcode, so if you'd rather not deal with the hassle, see the download option below. If you use a lot of command line utilities or want a package manager for all your non-MAS apps, I highly recommend getting Homebrew [set up](https://brew.sh).
+
+If you have Homebrew installed, just run:
 
 ```console
 brew tap ttscoff/thelab
 brew install gather-cli
 ```
+
+If you get errors, the most common solution is to run `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`. Seems to fix just about every issue I've had reported.
 
 #### Manual Install
 
