@@ -1,5 +1,9 @@
 ## 2.0.34
 
+#### IMPROVED
+
+- Documentation update
+
 #### FIXED
 
 - Double h1 headlines being inserted

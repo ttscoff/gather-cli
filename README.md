@@ -51,31 +51,47 @@ Double click to run the installer. This will install gather to /usr/local/bin wi
 
 ### Usage
 
-```console
+```
 USAGE: gather [<options>] [<url>]
 
 ARGUMENTS:
   <url>                   The URL to parse
 
 OPTIONS:
-  -v, --version           Display current version number
-  -s, --stdin             Get input from STDIN
-  -p, --paste             Get input from clipboard
-  --env <env>             Get input from and environment variable
   -c, --copy              Copy output to clipboard
+  --env <env>             Get input from and environment variable
+  -f, --file <file>       Save output to file path. Accepts %date, %slugdate, %title, and %slug
   --html                  Expect raw HTML instead of a URL
-  --readability/--no-readability
-                          Use readability (default: true)
+  --include-source/--no-include-source
+                          Include source link to original URL (default: true)
+  --include-title/--no-include-title
+                          Include page title as h1 (default: true)
+  --inline-links          Use inline links
+  --metadata              Include page title, date, source url as MultiMarkdown metadata
+  -p, --paste             Get input from clipboard
   --paragraph-links/--no-paragraph-links
                           Insert link references after each paragraph (default: true)
-  --inline-links/--no-inline-links
-                          Use inline links (default: false)
+  --readability/--no-readability
+                          Use readability (default: true)
+  -s, --stdin             Get input from STDIN
+  -t, --title-only        Output only page title
   --unicode/--no-unicode  Use Unicode characters instead of ascii replacements (default: true)
   --accepted-only         Only save accepted answer from StackExchange question pages
+  --include-comments      Include comments on StackExchange question pages
   --min-upvotes <min-upvotes>
                           Only save answers from StackExchange page with minimum number of upvotes (default: 0)
-  --include-comments      Include comments on StackExchange question pages
-  -f, --file <file>       Save output to file path
+  --nv-url                Output as an Notational Velocity/nvALT URL
+  --nv-add                Add output to Notational Velocity/nvALT immediately
+  --nvu-url               Output as an nvUltra URL
+  --nvu-add               Add output to nvUltra immediately
+  --nvu-notebook <nvu-notebook>
+                          Specify an nvUltra notebook for the 'make' URL
+  --url-template <url-template>
+                          Create a URL scheme from a template using %title, %text, %notebook, %source, %date, %filename, and %slug
+  --fallback-title <fallback-title>
+                          Fallback title to use if no title is found, accepts %date
+  --url-open              Open URL created from template
+  -v, --version           Display current version number
   -h, --help              Show help information.
 ```
 
@@ -109,6 +125,12 @@ By default Gather will use reference-style links, and will place the references 
 
 By default Gather will maintain Unicode characters in the output. If you'd prefer to have an ASCII equivalent substituted, you can use `--no-unicode`. This feature may not be working properly yet.
 
+`--include-source` will add a `[Source](PAGE_URL)` link to the top of the document. You can disable this link with `--no-include-source`.
+
+`--include-title` will attempt to insert an H1 title if the output doesn't have one. If a title can be determined and a matching h1 doesn't exist, it will be added at the top of the document. This is handy when the page has its header (and headline) outside of the content area that Readability chooses as the main block, and the option defaults to true. `--no-include-title` will disable this, but it will not remove an existing h1 from the document.
+
+If you just want to get the title of a URL, use `--title-only` to output a plain text title with no decoration.
+
 #### Stack Exchange Options
 
 Gather has some features specifically for saving answers from StackExchange sites like StackOverflow and AskDifferent. I love saving answers I find on StackOverflow to my notes for later where I can have them tagged, indexed, searchable, and curated. I wanted to make Gather a perfect tool for quickly making those notes.
@@ -134,4 +156,24 @@ You can include a `--nvu-notebook PATH` option to specify which notebook the not
 [Here's a Shortcut](https://github.com/ttscoff/gather-cli/raw/main/extras/Gather%20to%20nvUltra.shortcut) that accepts text or URLs and runs `gather --nv-add` on them. I trigger it with LaunchBar to send the current page from my browser straight to nvUltra.
 
 The `url` and `add` options work with just `--nv` instead of `--nvu` to generate an `nv://` url that will work with Notational Velocity or nvALT.
+
+#### Other URL handlers
+
+You can generate any kind of url scheme you want using `--url-template`. This is a string that can contain the following placeholders (all URL encoded):
+
+- %title: The title of the page
+- %text: The markdown text of the page
+- %notebook: The contents of the `--nvu-notebook` option, can be used for additional meta in another key
+- %source: The canonical URL of the captured page, if available
+- %date: Today's date and time in the format YYYY-mm-dd HH:MM
+- %filename: The title of the page sanitized for use as a file name
+- %slug: The title of the page lowercased, all punctuation and spaces replaced with dashes (`using-gather-as-a-web-clipper`)
+
+You can include a fallback title using `--fallback-title "TITLE"`. If a page title can't be determined (common when running on snippets of HTML), this variable will be inserted. You can include the "%date" placeholder, which will be replaced with an ISO datetime.
+
+To show nvUltra's url scheme in this manner:
+
+    --url-template "x-nvultra://make/?txt=%text&title=%filename&notebook=%notebook"
+
+Add the `--url-open` flag to have the URL automatically executed instead of being returned.
 
