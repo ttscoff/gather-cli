@@ -1,3 +1,9 @@
+## 2.0.41
+
+#### FIXED
+
+- Missing title if a rel=canonical url not found
+
 ## 2.0.40
 
 #### FIXED
