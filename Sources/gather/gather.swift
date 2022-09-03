@@ -94,7 +94,11 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
 
             if started {
                 sourceUrl = readability.canonical
+                if sourceUrl == nil {
+                    sourceUrl = url
+                }
                 title = try readability.getTitle()?.text()
+
                 if read != false {
                     html = try readability.getContent()!.html()
                     html = html!.trimmingCharacters(in: .whitespacesAndNewlines)
