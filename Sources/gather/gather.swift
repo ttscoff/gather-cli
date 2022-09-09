@@ -4,7 +4,7 @@ import Cocoa
 import Foundation
 import HTML2Text
 import Readability
-var VERSION = "2.0.42"
+var VERSION = "2.0.43"
 
 var acceptedAnswerOnly = false
 var disableReadability = false
@@ -163,11 +163,8 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
             } else {
                 source = "[Source](\(sourceUrl!))\n\n"
             }
-        } else if url == nil, title != nil {
-            if includeTitleAsH1, countH1s(html!, title: title) == 0 {
-                source = "# \(title!)\n\n"
-            }
-            // source = "# \(title!)\n\n"
+        } else if title != nil, includeTitleAsH1 {
+            source = "# \(title!)\n\n"
         }
         html = "\(meta)\(source)\(html!)"
 
