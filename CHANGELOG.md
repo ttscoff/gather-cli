@@ -1,5 +1,9 @@
 ## 2.0.43
 
+#### FIXED
+
+- Missing h1 title with --no-include-source
+
 ## 2.0.42
 
 #### FIXED
