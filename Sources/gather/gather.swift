@@ -12,6 +12,7 @@ var escapeSpecial = false
 var grafLinks = true
 var includeAnswerComments = false
 var includeMetadata = false
+var includeMetadataYAML = false
 var titleFallback = ""
 var includeSourceLink = true
 var includeTitleAsH1 = true
@@ -132,7 +133,10 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
         var source = ""
         var meta = ""
 
-        if includeMetadata {
+        if includeMetadata || includeMetadataYAML {
+            if includeMetadataYAML {
+                meta += "---\n"
+            }
             let date = iso_datetime()
 
             if title != nil {
@@ -150,7 +154,11 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
             }
 
             meta += "\ndate: \(date)"
-            meta += "\n\n"
+            if includeMetadataYAML {
+                meta += "\n---\n"
+            } else {
+                meta += "\n\n"
+            }
         }
 
         if includeSourceLink, sourceUrl != nil {
@@ -356,6 +364,9 @@ struct Gather: ParsableCommand {
     @Flag(help: "Include page title, date, source url as MultiMarkdown metadata")
     var metadata = false
 
+    @Flag(help: "Include page title, date, source url as YAML front matter")
+    var metadataYaml = false
+
     @Flag(name: .shortAndLong, help: "Get input from clipboard")
     var paste = false
 
@@ -434,6 +445,7 @@ struct Gather: ParsableCommand {
         includeTitleAsH1 = includeTitle
         onlyOutputTitle = titleOnly
         includeMetadata = metadata
+        includeMetadataYAML = metadataYaml
         includeSourceLink = includeSource
         titleFallback = fallbackTitle
         // escapeSpecial = escape
