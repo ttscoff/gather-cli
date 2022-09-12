@@ -1,3 +1,9 @@
+## 2.0.44
+
+#### NEW
+
+- --metadata-yaml option to include source info as YAML front matter
+
 ## 2.0.43
 
 #### FIXED
