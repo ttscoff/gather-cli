@@ -25,9 +25,9 @@ let package = Package(
                 .product(name: "HTML2Text", package: "html2text-swift"),
             ]
         ),
-        .testTarget(
-            name: "gather-cliTests",
-            dependencies: ["gather"]
-        ),
+        // .testTarget(
+        //     name: "gather-cliTests",
+        //     dependencies: ["gather"]
+        // ),
     ]
 )
