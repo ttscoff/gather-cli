@@ -1,5 +1,7 @@
 ## 2.0.45
 
+#### IMPROVED
+
 - Clean up curly quotes in titles
 
 ## 2.0.44

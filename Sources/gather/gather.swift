@@ -10,6 +10,8 @@ var acceptedAnswerOnly = false
 var disableReadability = false
 var escapeSpecial = false
 var grafLinks = true
+var localizeImages = false
+var assetPath = ""
 var includeAnswerComments = false
 var includeMetadata = false
 var includeMetadataYAML = false
@@ -114,6 +116,11 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
         }
 
         let h = HTML2Text(baseurl: baseurl!)
+        h.localize_images = localizeImages
+        if localizeImages, assetPath != "" {
+            h.asset_path = assetPath
+        }
+
         h.links_each_paragraph = grafLinks
         h.inline_links = inline
         h.unicode_snob = unicodeSnob
@@ -340,6 +347,12 @@ struct Gather: ParsableCommand {
     @Flag(name: .shortAndLong, help: "Copy output to clipboard")
     var copy = false
 
+    @Flag(help: "Download and save images locally to asset folder")
+    var downloadImages = false
+
+    @Option(help: "Define an asset folder for saved images")
+    var downloadPath = ""
+
     @Option(help: "Get input from and environment variable")
     var env: String = ""
 
@@ -436,6 +449,11 @@ struct Gather: ParsableCommand {
         } else if paragraphLinks {
             inline = false
             grafLinks = paragraphLinks
+        }
+
+        if downloadImages {
+            localizeImages = true
+            assetPath = downloadPath
         }
 
         unicodeSnob = unicode
