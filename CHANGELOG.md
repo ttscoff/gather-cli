@@ -1,5 +1,10 @@
 ## 2.0.45
 
+#### FIXED
+
+- Incorrect handling of links with no protocol (`//github.com...`)
+- Incorrect formatting of links with emphasis (`_[text_][5]`)
+
 ## 2.0.44
 
 #### NEW
