@@ -1,10 +1,9 @@
 # Gather CLI
 
-
 ![Howzit banner image](https://cdn3.brettterpstra.com/uploads/2022/08/gatherheader-rb.webp)
 
 
-Current version: 2.0.46
+Current version: 2.0.47
 
 This project is the successor to read2text, which was a Python based tool that used Arc90 Readability and html2text to convert web URLs to Markdown documents, ready to store in your notes. It takes its name from another of my similar projects that I've since retired. It was this, but with a GUI, and this is infinitely more scriptable and is designed to nestle into your favorite tools and projects.
 
@@ -16,9 +15,9 @@ The code is available [on GitHub](https://github.com/ttscoff/gather-cli). It's b
 
 #### Via Homebrew
 
-The easiest way to install Gather is with [Homebrew](https://brew.sh). Homebrew requires installing Xcode, so if you'd rather not deal with the hassle, see the download option below. If you use a lot of command line utilities or want a package manager for all your non-MAS apps, I highly recommend getting Homebrew [set up](https://brew.sh).
+The easiest way to install Gather is with [Homebrew](https://brew.sh). Building gather from source via Homebrew requires installing Xcode, so if you'd rather not deal with the hassle, see the download option below. If you use a lot of command line utilities or want a package manager for all your non-MAS apps, I highly recommend getting Homebrew [set up](https://brew.sh).
 
-If you have Homebrew installed, just run:
+If you have Homebrew and Xcode installed, just run:
 
 ```console
 brew tap ttscoff/thelab
@@ -39,12 +38,12 @@ swift build -c release
 
 The gather binary will be located in `.build/release/gather`. Copy it wherever you keep your binaries in your PATH.
 
+Or... just run `make install`, which will build the release version and copy it to `/usr/local/bin`.
+
 #### Downloading
 
 
-
-[Download the PKG installer from BrettTerpstra.com](https://brettterpstra.com/downloads/gather-cli-latest.pkg)
-
+[Download the latest PKG installer](https://github.com/ttscoff/gather-cli/releases/latest)
 
 
 Double click to run the installer. This will install gather to /usr/local/bin with root permissions.
