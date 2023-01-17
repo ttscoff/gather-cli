@@ -1,3 +1,9 @@
+## 2.0.47
+
+#### IMPROVED
+
+- Don't attempt to remove extraneous bits from SEO titles, leave as is
+
 ## 2.0.46
 
 #### FIXED
