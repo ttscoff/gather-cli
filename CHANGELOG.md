@@ -1,3 +1,16 @@
+## 2.0.48
+
+#### NEW
+
+- Use --save TITLE to save a set of command line flags for future use
+- Use --config TITLE to restore a set of saved flags
+
+## 2.0.47
+
+#### IMPROVED
+
+- Don't attempt to remove extraneous bits from SEO titles, leave as is
+
 ## 2.0.46
 
 #### FIXED

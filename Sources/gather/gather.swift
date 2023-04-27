@@ -4,7 +4,8 @@ import Cocoa
 import Foundation
 import HTML2Text
 import Readability
-var VERSION = "2.0.46"
+import Yams
+var VERSION = "2.1.0"
 
 var acceptedAnswerOnly = false
 var disableReadability = false
@@ -298,6 +299,43 @@ func writeToClipboard(string: String) {
     print("Content in clipboard")
 }
 
+func readSettings(name: String) -> [String: Any] {
+    let filename = "\(name).yaml"
+    let path = NSString(string: "~/.config/gather/configs").expandingTildeInPath
+    var loadedDict: [String: Any] = [:]
+    let dir = URL(fileURLWithPath: path)
+    let filepath = dir.appendingPathComponent(filename)
+    do {
+        let yaml = try String(contentsOf: filepath)
+        loadedDict = try Yams.load(yaml: yaml) as! [String: Any]
+    } catch let error as NSError {
+        print("Error reading settings: \(error.localizedDescription)")
+    }
+
+    return loadedDict
+}
+
+func writeSettings(name: String, content: String) {
+    let filename = "\(name).yaml"
+    let manager = FileManager.default
+    let path = NSString(string: "~/.config/gather/configs").expandingTildeInPath
+    do {
+        try manager.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
+    } catch let error as NSError {
+        print("Error creating settings folder: \(error.localizedDescription)")
+    }
+
+    let dirURL = URL(fileURLWithPath: path)
+    let filepath = dirURL.appendingPathComponent(filename)
+
+    do {
+        try content.write(to: filepath, atomically: true, encoding: String.Encoding.utf8)
+        print("Settings saved to file: \(filepath)")
+    } catch let error as NSError {
+        print("Failed writing to: \(filepath), Error: " + error.localizedDescription)
+    }
+}
+
 func writeToFile(filename: String, content: String, title: String?) {
     var newname = filename.replacingOccurrences(of: #"%date"#, with: iso_datetime(), options: [.regularExpression, .caseInsensitive])
     newname = newname.replacingOccurrences(of: #"%slugdate"#, with: slugifyFile(name: iso_datetime()), options: [.regularExpression, .caseInsensitive])
@@ -340,7 +378,7 @@ struct Gather: ParsableCommand {
     @Flag(name: .shortAndLong, help: "Copy output to clipboard")
     var copy = false
 
-    @Option(help: "Get input from and environment variable")
+    @Option(help: "Get input from an environment variable")
     var env: String = ""
 
     // @Flag(help: "Escape special characters")
@@ -421,6 +459,12 @@ struct Gather: ParsableCommand {
     @Flag(help: "Open URL created from template")
     var urlOpen = false
 
+    @Option(help: "Save settings to NAME")
+    var save: String?
+
+    @Option(help: "Load settings from NAME")
+    var config: String?
+
     @Flag(name: .shortAndLong, help: "Display current version number")
     var version = false
 
@@ -429,6 +473,65 @@ struct Gather: ParsableCommand {
 
     mutating func run() throws {
         var input: String?
+
+        if save != nil {
+            let settings: [String: Any] = [
+                "file": file,
+                "html": html,
+                "includeSource": includeSource,
+                "includeTitle": includeTitle,
+                "inlineLinks": inlineLinks,
+                "metadata": metadata,
+                "metadataYaml": metadataYaml,
+                "paste": paste,
+                "paragraphLinks": paragraphLinks,
+                "readability": readability,
+                "stdin": stdin,
+                "titleOnly": titleOnly,
+                "unicode": unicode,
+                "acceptedOnly": acceptedOnly,
+                "includeComments": includeComments,
+                "minUpvotes": minUpvotes,
+                "nvUrl": nvUrl,
+                "nvAdd": nvAdd,
+                "nvuUrl": nvuUrl,
+                "nvuAdd": nvuAdd,
+                "nvuNotebook": nvuNotebook,
+                "urlTemplate": urlTemplate,
+                "fallbackTitle": fallbackTitle,
+                "urlOpen": urlOpen,
+            ]
+            let mapYAML: String = try Yams.dump(object: settings)
+            writeSettings(name: save!, content: mapYAML)
+        }
+
+        if config != nil {
+            let settings: [String: Any] = readSettings(name: config!)
+            file = settings["file"] as! String
+            html = settings["html"] as! Bool
+            includeSource = settings["includeSource"] as! Bool
+            includeTitle = settings["includeTitle"] as! Bool
+            inlineLinks = settings["inlineLinks"] as! Bool
+            metadata = settings["metadata"] as! Bool
+            metadataYaml = settings["metadataYaml"] as! Bool
+            paste = settings["paste"] as! Bool
+            paragraphLinks = settings["paragraphLinks"] as! Bool
+            readability = settings["readability"] as! Bool
+            stdin = settings["stdin"] as! Bool
+            titleOnly = settings["titleOnly"] as! Bool
+            unicode = settings["unicode"] as! Bool
+            acceptedOnly = settings["acceptedOnly"] as! Bool
+            includeComments = settings["includeComments"] as! Bool
+            minUpvotes = settings["minUpvotes"] as! Int
+            nvUrl = settings["nvUrl"] as! Bool
+            nvAdd = settings["nvAdd"] as! Bool
+            nvuUrl = settings["nvuUrl"] as! Bool
+            nvuAdd = settings["nvuAdd"] as! Bool
+            nvuNotebook = settings["nvuNotebook"] as! String
+            urlTemplate = settings["urlTemplate"] as! String
+            fallbackTitle = settings["fallbackTitle"] as! String
+            urlOpen = settings["urlOpen"] as! Bool
+        }
 
         if inlineLinks {
             grafLinks = false

@@ -12,6 +12,7 @@ let package = Package(
         // .package(path: "./read-swift"),
         // .package(path: "./html2text-swift"),
         .package(url: "https://github.com/ttscoff/SwiftSoup.git", from: "2.0.0"),
+        .package(url: "https://github.com/jpsim/Yams.git", from: "5.0.4"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -23,6 +24,7 @@ let package = Package(
                 .product(name: "SwiftSoup", package: "SwiftSoup"),
                 .product(name: "Readability", package: "read-swift"),
                 .product(name: "HTML2Text", package: "html2text-swift"),
+                .product(name: "Yams", package: "Yams"),
             ]
         ),
         // .testTarget(
