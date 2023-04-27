@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 current_ver = ARGV[0]
-src = 'src/README.md'
+src = 'src/_README.md'
 dest = 'README.md'
 
 readme = IO.read(src).force_encoding('ASCII-8BIT').encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')

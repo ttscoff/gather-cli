@@ -3,14 +3,17 @@
 <!--README--><!--GITHUB-->![Howzit banner image](https://cdn3.brettterpstra.com/uploads/2022/08/gatherheader-rb.webp)<!--END GITHUB-->
 <!--JEKYLL{% img aligncenter 800 220 /uploads/2022/08/gatherheader-rb.jpg "Howzit banner image" %}-->
 
-Current version: <!--VER-->2.0.47<!--END VER-->
+Current version: <!--VER-->2.1.0<!--END VER-->
 
 This project is the successor to read2text, which was a Python based tool that used Arc90 Readability and html2text to convert web URLs to Markdown documents, ready to store in your notes. It takes its name from another of my similar projects that I've since retired. It was this, but with a GUI, and this is infinitely more scriptable and is designed to nestle into your favorite tools and projects.
 
 This version is Swift-based and compiled as a binary that doesn't require Python or any other processor to run. It has more options, better parsing, and should be an all-around useful tool, easy to incorporate into almost any project.
 
 The code is available [on GitHub](https://github.com/ttscoff/gather-cli). It's built as a Swift Package and can be compiled using the `swift` command line tool. I'm just learning Swift, so I guarantee there's a lot of stupidity in the code. If you dig in, feel free to kindly point out my errors.
-
+<!--JEKYLL
+* Contents
+{:toc}
+-->
 ### Installation
 
 #### Via Homebrew
@@ -186,6 +189,14 @@ The `--url-template`:
 These are the other options he uses along with it:
 
     --url-open --inline-links --no-paragraph-links --fallback-title 'webclip %date'
+
+### Troubleshooting
+
+#### No content returned, only title
+
+When a url returns only a title via Gather, it usually means the markup was unparseable. In many cases, this is because the page itself is populated by JavaScript after page load, so what Gather retrieves is nothing more than a `<script>` tag. Gather can't render such pages as it stands, so the best option is to open the page in a web browser, select all and copy to clipboard, then run `gather --paste --html` to convert the content to Markdown. You can also set up a macOS Shortcut to make this process more streamlined.
+
+
 
 <!--END README-->
 
