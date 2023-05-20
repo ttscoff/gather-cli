@@ -24,8 +24,8 @@ var unicodeSnob = true
 var wrapWidth = 0
 
 func exitWithError(error: Int32, message: String? = nil) {
-    if message != nil {
-        print(message!)
+    if let message {
+        print(message)
     }
     exit(error)
 }
@@ -33,9 +33,9 @@ func exitWithError(error: Int32, message: String? = nil) {
 func get_title(html: String?, url: String?) -> String? {
     var title = String?(nil)
 
-    if html != nil {
+    if let html {
         do {
-            let readability = Readability(html: html!)
+            let readability = Readability(html: html)
             let started = readability.start()
 
             if started {
@@ -46,8 +46,8 @@ func get_title(html: String?, url: String?) -> String? {
             print("Error parsing page")
             return title
         }
-    } else if url != nil {
-        let u = url!.replacingOccurrences(of: "[?&]utm_[^#]+", with: "", options: .regularExpression)
+    } else if let url {
+        let u = url.replacingOccurrences(of: "[?&]utm_[^#]+", with: "", options: .regularExpression)
         guard let page = try? String(contentsOf: URL(string: u)!, encoding: .utf8) else {
             return title
         }
@@ -71,8 +71,8 @@ func markdownify_input(html: String?, read: Bool?) -> (String?, String, String?)
 
 func countH1s(_ s: String, title: String?) -> Int {
     var pattern = "^# ."
-    if title != nil {
-        pattern = "^# \(NSRegularExpression.escapedPattern(for: title!))"
+    if let title {
+        pattern = "^# \(NSRegularExpression.escapedPattern(for: title))"
     }
 
     let re = try! NSRegularExpression(pattern: pattern, options: [.anchorsMatchLines, .caseInsensitive])
@@ -81,13 +81,12 @@ func countH1s(_ s: String, title: String?) -> Int {
 }
 
 func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String? = "") -> (String?, String, String?) {
-    var html = html
     var title = String?(nil)
     var sourceUrl = url
 
-    if html != nil {
+    if var html {
         do {
-            let readability = Readability(html: html!)
+            let readability = Readability(html: html)
             readability.allSpecialHandling = true
             readability.acceptedAnswerOnly = acceptedAnswerOnly
             readability.includeAnswerComments = includeAnswerComments
@@ -103,7 +102,7 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
 
                 if read != false {
                     html = try readability.getContent()!.html()
-                    html = html!.trimmingCharacters(in: .whitespacesAndNewlines)
+                    html = html.trimmingCharacters(in: .whitespacesAndNewlines)
                 }
             }
 
@@ -121,15 +120,15 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
         h.escape_snob = escapeSpecial
         h.body_width = wrapWidth
 
-        let data = html!
+        let data = html
 
         let html2textresult = h.main(baseurl: baseurl ?? "", data: data)
 
         html = html2textresult.replacingOccurrences(of: #"([*-+] .*?)\n+(?=[*-+] )"#, with: "$1\n", options: .regularExpression)
 
-        html = html!.replacingOccurrences(of: #"(?m)\n{2,}"#, with: "\n\n")
+        html = html.replacingOccurrences(of: #"(?m)\n{2,}"#, with: "\n\n")
 
-        html = html!.replacingOccurrences(of: "__BR__", with: "  ")
+        html = html.replacingOccurrences(of: "__BR__", with: "  ")
 
         var source = ""
         var meta = ""
@@ -140,8 +139,8 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
             }
             let date = iso_datetime()
 
-            if title != nil {
-                meta += "title: \"\(title!)\""
+            if let title {
+                meta += "title: \"\(title)\""
             } else {
                 if titleFallback.isEmpty {
                     meta += "title: Clipped on \(date)"
@@ -150,8 +149,8 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
                 }
             }
 
-            if sourceUrl != nil {
-                meta += "\nsource: \(sourceUrl!)"
+            if let sourceUrl {
+                meta += "\nsource: \(sourceUrl)"
             }
 
             meta += "\ndate: \(date)"
@@ -162,22 +161,22 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
             }
         }
 
-        if includeSourceLink, sourceUrl != nil {
-            if title != nil {
+        if includeSourceLink, let sourceUrl {
+            if let title {
                 if includeTitleAsH1 {
-                    source = "# \(title!)\n\n[Source](\(sourceUrl!) \"\(title!)\")\n\n"
+                    source = "# \(title)\n\n[Source](\(sourceUrl) \"\(title)\")\n\n"
                 } else {
-                    source = "[Source](\(sourceUrl!) \"\(title!)\")\n\n"
+                    source = "[Source](\(sourceUrl) \"\(title)\")\n\n"
                 }
             } else {
-                source = "[Source](\(sourceUrl!))\n\n"
+                source = "[Source](\(sourceUrl))\n\n"
             }
-        } else if title != nil, includeTitleAsH1 {
-            source = "# \(title!)\n\n"
+        } else if let title, includeTitleAsH1 {
+            source = "# \(title)\n\n"
         }
-        html = "\(meta)\(source)\(html!)"
+        html = "\(meta)\(source)\(html)"
 
-        return (title, html!, sourceUrl)
+        return (title, html, sourceUrl)
     }
 
     return (title, "", url)
@@ -600,7 +599,7 @@ struct Gather: ParsableCommand {
         var markdown: String
         var sourceUrl: String?
 
-        if input != nil {
+        if let input {
             (title, markdown, sourceUrl) = markdownify_input(html: input, read: readability)
         } else if url != "" {
             (title, markdown, sourceUrl) = markdownify(url: url, read: readability)
