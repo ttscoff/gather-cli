@@ -237,10 +237,7 @@ func slugifyFile(name: String) -> String {
 }
 
 func createUrlScheme(template: String, markdown: String, title: String?, notebook: String?, source: String?) -> String {
-    var note_title = ""
-    if title != nil {
-        note_title = title!
-    }
+    let note_title = title ?? ""
     var url = template.replacingOccurrences(of: #"%title"#, with: urlEncodeQuery(string: note_title), options: [.regularExpression, .caseInsensitive])
     url = url.replacingOccurrences(of: #"%text"#, with: urlEncodeQuery(string: markdown), options: [.regularExpression, .caseInsensitive])
     url = url.replacingOccurrences(of: #"%notebook"#, with: urlEncodeQuery(string: notebook ?? ""), options: [.regularExpression, .caseInsensitive])
