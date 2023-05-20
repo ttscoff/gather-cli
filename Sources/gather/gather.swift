@@ -365,12 +365,8 @@ func readInput() -> String? {
     return input
 }
 
-func readEnv(variable: String) -> String? {
-    if let input = ProcessInfo.processInfo.environment[variable] {
-        return input
-    }
-
-    return ""
+func readEnv(variable: String) -> String {
+    ProcessInfo.processInfo.environment[variable] ?? ""
 }
 
 @main
@@ -571,9 +567,9 @@ struct Gather: ParsableCommand {
                 }
 
                 if html {
-                    input = readEnv(variable: env)!
+                    input = readEnv(variable: env)
                 } else {
-                    url = readEnv(variable: env)!
+                    url = readEnv(variable: env)
                 }
             } else {
                 if html {
