@@ -173,9 +173,10 @@ func markdownify_html(html: String?, read: Bool, url: String?, baseurl: String? 
     } else if let title, includeTitleAsH1 {
         source = "# \(title)\n\n"
     }
-    html = "\(meta)\(source)\(html)"
 
-    return (title, html, sourceUrl)
+    let formattedMarkdown = "\(meta)\(source)\(html)"
+
+    return (title, formattedMarkdown, sourceUrl)
 }
 
 func markdownify(url: String, read: Bool) -> (String?, String, String?) {
