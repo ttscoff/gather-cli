@@ -179,14 +179,17 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
 }
 
 func markdownify(url: String, read: Bool?) -> (String?, String, String?) {
-    var baseurl = url
-
     let u = url.replacingOccurrences(of: "[?&]utm_[^#]+", with: "", options: .regularExpression)
     guard let base = URL(string: u), var host = base.host else {
         exitWithError(error: 1, message: "error: invalid URL")
         return (nil, "", nil)
     }
 
+    guard let page = try? String(contentsOf: base, encoding: .utf8) else {
+        return (nil, "", nil)
+    }
+
+    var baseurl = url
     let scheme = base.scheme
     if let port = base.port {
         host = "\(host):\(port)"
@@ -194,10 +197,6 @@ func markdownify(url: String, read: Bool?) -> (String?, String, String?) {
 
     if let scheme {
         baseurl = "\(scheme)://\(host)"
-    }
-
-    guard let page = try? String(contentsOf: base, encoding: .utf8) else {
-        return (nil, "", nil)
     }
 
     return markdownify_html(html: page, read: read, url: u, baseurl: baseurl)
