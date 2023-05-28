@@ -180,12 +180,7 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
 
 func markdownify(url: String, read: Bool?) -> (String?, String, String?) {
     var url = url
-    var html: String?
     var baseurl = url
-
-    if html == nil {
-        return (nil, "No valid url, html or text was provided.", nil)
-    }
 
     let u = url.replacingOccurrences(of: "[?&]utm_[^#]+", with: "", options: .regularExpression)
     guard let base = URL(string: u) else {
@@ -207,10 +202,9 @@ func markdownify(url: String, read: Bool?) -> (String?, String, String?) {
         return (nil, "", nil)
     }
 
-    html = page
     url = u
 
-    return markdownify_html(html: html, read: read, url: url, baseurl: baseurl)
+    return markdownify_html(html: page, read: read, url: url, baseurl: baseurl)
 }
 
 func urlEncodeQuery(string: String) -> String {
