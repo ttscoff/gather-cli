@@ -64,7 +64,7 @@ func iso_datetime() -> String {
     return dateFormatterPrint.string(from: Date())
 }
 
-func markdownify_input(html: String?, read: Bool?) -> (String?, String, String?) {
+func markdownify_input(html: String?, read: Bool) -> (String?, String, String?) {
     let read = read
     return markdownify_html(html: html, read: read, url: nil)
 }
@@ -76,7 +76,7 @@ func countH1s(_ s: String, title: String?) -> Int {
     return re.matches(in: s, options: [], range: checkRange).count
 }
 
-func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String? = "") -> (String?, String, String?) {
+func markdownify_html(html: String?, read: Bool, url: String?, baseurl: String? = "") -> (String?, String, String?) {
     var title: String?
     var sourceUrl = url
 
@@ -99,7 +99,7 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
             }
             title = try readability.getTitle()?.text()
 
-            if read != false {
+            if read {
                 html = try readability.getContent()!.html()
                 html = html.trimmingCharacters(in: .whitespacesAndNewlines)
             }
@@ -178,7 +178,7 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
     return (title, html, sourceUrl)
 }
 
-func markdownify(url: String, read: Bool?) -> (String?, String, String?) {
+func markdownify(url: String, read: Bool) -> (String?, String, String?) {
     let cleanedURLString = url.replacingOccurrences(of: "[?&]utm_[^#]+", with: "", options: .regularExpression)
     guard let base = URL(string: cleanedURLString), var host = base.host else {
         exitWithError(error: 1, message: "error: invalid URL")
