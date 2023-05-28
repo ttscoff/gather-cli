@@ -197,7 +197,7 @@ func markdownify(url: String, read: Bool?) -> (String?, String, String?) {
         baseurl = "\(scheme)://\(host)"
     }
 
-    guard let page = try? String(contentsOf: URL(string: u)!, encoding: .utf8) else {
+    guard let page = try? String(contentsOf: base, encoding: .utf8) else {
         return (nil, "", nil)
     }
 
