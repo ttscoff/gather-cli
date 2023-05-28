@@ -178,39 +178,37 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
     return (title, html, sourceUrl)
 }
 
-func markdownify(url: String?, read: Bool?) -> (String?, String, String?) {
+func markdownify(url: String, read: Bool?) -> (String?, String, String?) {
     var url = url
     var html: String?
     var baseurl = url
 
-    if url == nil, html == nil {
+    if html == nil {
         return (nil, "No valid url, html or text was provided.", nil)
     }
 
-    if url != nil {
-        let u = url!.replacingOccurrences(of: "[?&]utm_[^#]+", with: "", options: .regularExpression)
-        guard let base = URL(string: u) else {
-            exitWithError(error: 1, message: "error: invalid URL")
-            return (nil, "", nil)
-        }
-
-        let scheme = base.scheme
-        var host = base.host
-        if base.port != nil {
-            host = "\(host!):\(base.port!)"
-        }
-
-        if scheme != nil, host != nil {
-            baseurl = "\(scheme!)://\(host!)"
-        }
-
-        guard let page = try? String(contentsOf: URL(string: u)!, encoding: .utf8) else {
-            return (nil, "", nil)
-        }
-
-        html = page
-        url = u
+    let u = url.replacingOccurrences(of: "[?&]utm_[^#]+", with: "", options: .regularExpression)
+    guard let base = URL(string: u) else {
+        exitWithError(error: 1, message: "error: invalid URL")
+        return (nil, "", nil)
     }
+
+    let scheme = base.scheme
+    var host = base.host
+    if base.port != nil {
+        host = "\(host!):\(base.port!)"
+    }
+
+    if scheme != nil, host != nil {
+        baseurl = "\(scheme!)://\(host!)"
+    }
+
+    guard let page = try? String(contentsOf: URL(string: u)!, encoding: .utf8) else {
+        return (nil, "", nil)
+    }
+
+    html = page
+    url = u
 
     return markdownify_html(html: html, read: read, url: url, baseurl: baseurl)
 }
