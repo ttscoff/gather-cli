@@ -31,7 +31,7 @@ func exitWithError(error: Int32, message: String? = nil) {
 }
 
 func get_title(html: String?, url: String?) -> String? {
-    var title = String?(nil)
+    var title: String?
 
     if let html {
         do {
@@ -70,18 +70,14 @@ func markdownify_input(html: String?, read: Bool?) -> (String?, String, String?)
 }
 
 func countH1s(_ s: String, title: String?) -> Int {
-    var pattern = "^# ."
-    if let title {
-        pattern = "^# \(NSRegularExpression.escapedPattern(for: title))"
-    }
-
+    let pattern = title != nil ? "^# \(NSRegularExpression.escapedPattern(for: title!))" : "^# ."
     let re = try! NSRegularExpression(pattern: pattern, options: [.anchorsMatchLines, .caseInsensitive])
     let checkRange = NSRange(s.startIndex ..< s.endIndex, in: s)
     return re.matches(in: s, options: [], range: checkRange).count
 }
 
 func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String? = "") -> (String?, String, String?) {
-    var title = String?(nil)
+    var title: String?
     var sourceUrl = url
 
     guard var html else {
@@ -184,7 +180,7 @@ func markdownify_html(html: String?, read: Bool?, url: String?, baseurl: String?
 
 func markdownify(url: String?, read: Bool?) -> (String?, String, String?) {
     var url = url
-    var html = String?(nil)
+    var html: String?
     var baseurl = url
 
     if url == nil, html == nil {
