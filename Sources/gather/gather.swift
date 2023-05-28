@@ -183,19 +183,18 @@ func markdownify(url: String, read: Bool?) -> (String?, String, String?) {
     var baseurl = url
 
     let u = url.replacingOccurrences(of: "[?&]utm_[^#]+", with: "", options: .regularExpression)
-    guard let base = URL(string: u) else {
+    guard let base = URL(string: u), var host = base.host else {
         exitWithError(error: 1, message: "error: invalid URL")
         return (nil, "", nil)
     }
 
     let scheme = base.scheme
-    var host = base.host
-    if base.port != nil {
-        host = "\(host!):\(base.port!)"
+    if let port = base.port {
+        host = "\(host):\(port)"
     }
 
-    if scheme != nil, host != nil {
-        baseurl = "\(scheme!)://\(host!)"
+    if let scheme {
+        baseurl = "\(scheme)://\(host)"
     }
 
     guard let page = try? String(contentsOf: URL(string: u)!, encoding: .utf8) else {
