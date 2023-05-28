@@ -189,15 +189,10 @@ func markdownify(url: String, read: Bool?) -> (String?, String, String?) {
         return (nil, "", nil)
     }
 
-    var baseurl = url
-    let scheme = base.scheme
     if let port = base.port {
         host = "\(host):\(port)"
     }
-
-    if let scheme {
-        baseurl = "\(scheme)://\(host)"
-    }
+    let baseurl = base.scheme != nil ? "\(base.scheme!)://\(host)" : url
 
     return markdownify_html(html: page, read: read, url: cleanedURLString, baseurl: baseurl)
 }
