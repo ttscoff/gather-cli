@@ -77,7 +77,7 @@ notarizefile() { # $1: path to file to notarize, $2: identifier
 
 xcrun swift build -c release --arch arm64 --arch x86_64
 bindir=$(xcrun swift build -c release --arch arm64 --arch x86_64 --show-bin-path)
-codesign --force --verbose --sign 'Developer ID Application: Brett Terpstra' -o runtime --timestamp $bindir/$executable
+codesign --force --verbose --sign 'Developer ID Application: Brett Terpstra (47TRS7H4BH)' -o runtime --timestamp $bindir/$executable
 codesign --verify -vvvv $bindir/$executable
 rm -rf package
 mkdir -p package/usr/local/bin
