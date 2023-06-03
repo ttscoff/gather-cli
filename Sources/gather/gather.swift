@@ -119,7 +119,7 @@ func markdownify_html(html: String?, read: Bool, url: String?, baseurl: String =
     h.escape_snob = escapeSpecial
     h.body_width = wrapWidth
 
-    let html2textresult = h
+    let markdown = h
         .main(baseurl: baseurl, data: html)
         .replacingOccurrences(of: #"([*-+] .*?)\n+(?=[*-+] )"#, with: "$1\n", options: .regularExpression)
         .replacingOccurrences(of: #"(?m)\n{2,}"#, with: "\n\n")
@@ -170,7 +170,7 @@ func markdownify_html(html: String?, read: Bool, url: String?, baseurl: String =
         source = "# \(title)\n\n"
     }
 
-    let formattedMarkdown = "\(meta)\(source)\(html2textresult)"
+    let formattedMarkdown = "\(meta)\(source)\(markdown)"
 
     return (title, formattedMarkdown, sourceUrl)
 }
