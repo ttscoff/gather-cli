@@ -5,12 +5,12 @@ require 'csv'
 
 mainfile = ARGV[0]
 new_version = ARGV[1]
+src = ARGV[2] # 'src/_README.md'
+dest = ARGV[3] # 'README.md'
+
 content = IO.read(mainfile)
 content.sub!(/(?mi)(?<=var VERSION = ")(.*?)(?=")/, new_version)
 File.open(mainfile, 'w') { |f| f.puts content }
-
-src = 'src/README.md'
-dest = 'README.md'
 
 readme = IO.read(src).force_encoding('ASCII-8BIT').encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
 

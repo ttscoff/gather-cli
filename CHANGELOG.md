@@ -1,3 +1,11 @@
+## 2.1.2
+
+#### IMPROVED
+
+- Implement cleaned-up code from #16
+
+## 2.1.1
+
 ## 2.0.48
 
 #### NEW
