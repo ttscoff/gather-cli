@@ -77,38 +77,48 @@ func countH1s(_ s: String, title: String?) -> Int {
 }
 
 func markdownify_html(html: String, read: Bool, url: String?, baseurl: String = "") -> (String?, String, String?) {
+    let readability = Readability(html: html)
+    readability.allSpecialHandling = true
+    readability.acceptedAnswerOnly = acceptedAnswerOnly
+    readability.includeAnswerComments = includeAnswerComments
+    readability.minimumAnswerUpvotes = minimumAnswerUpvotes
+
     var title: String?
-    var sourceUrl = url
-    var html = html
-
-    do {
-        let readability = Readability(html: html)
-        readability.allSpecialHandling = true
-        readability.acceptedAnswerOnly = acceptedAnswerOnly
-        readability.includeAnswerComments = includeAnswerComments
-        readability.minimumAnswerUpvotes = minimumAnswerUpvotes
-        let started = readability.start()
-
-        if started {
-            sourceUrl = readability.canonical
-            if sourceUrl == nil {
-                sourceUrl = url
-            }
-            title = try readability.getTitle()?.text()
-
-            if read {
-                html = try readability.getContent()!.html()
-                html = html.trimmingCharacters(in: .whitespacesAndNewlines)
+    var sourceUrl: String?
+    var readableHtml: String?
+    if readability.start() {
+        // Get title
+        if let titleElement = readability.articleTitle {
+            do {
+                title = try titleElement.text()
+            } catch {
+                print("Readability was able to parse a title element but there was an error traversing it: \(error)")
             }
         }
 
-    } catch {
-        print("Error parsing readability, trying without")
-        if read != false {
-            return markdownify_html(html: html, read: false, url: url, baseurl: baseurl)
+        // Get URL
+        sourceUrl = readability.canonical ?? url
+
+        // Try to get article content if `read` is `true`.
+        if read {
+            if let contentElement = readability.articleContent {
+                do {
+                    readableHtml = try contentElement
+                        .html()
+                        .trimmingCharacters(in: .whitespacesAndNewlines)
+                } catch {
+                    print("Readability was able to parse a content element but there was an error traversing it: \(error)")
+                }
+            } else {
+                print("Readability was unable to parse article content.")
+            }
         }
+    } else {
+        print("Readability was unable to parse the HTML")
+        sourceUrl = url
     }
 
+    // Markdownify HTML
     let h = HTML2Text(baseurl: baseurl)
     h.links_each_paragraph = grafLinks
     h.inline_links = inline
@@ -117,14 +127,14 @@ func markdownify_html(html: String, read: Bool, url: String?, baseurl: String = 
     h.body_width = wrapWidth
 
     let markdown = h
-        .main(baseurl: baseurl, data: html)
+        .main(baseurl: baseurl, data: readableHtml ?? html)
         .replacingOccurrences(of: #"([*-+] .*?)\n+(?=[*-+] )"#, with: "$1\n", options: .regularExpression)
         .replacingOccurrences(of: #"(?m)\n{2,}"#, with: "\n\n")
         .replacingOccurrences(of: "__BR__", with: "  ")
 
+    // Formatting
     var source = ""
     var meta = ""
-
     if includeMetadata || includeMetadataYAML {
         if includeMetadataYAML {
             meta += "---\n"
