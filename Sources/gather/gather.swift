@@ -76,7 +76,7 @@ func countH1s(_ s: String, title: String?) -> Int {
     return re.matches(in: s, options: [], range: checkRange).count
 }
 
-func markdownify_html(html: String?, read: Bool, url: String?, baseurl: String? = "") -> (String?, String, String?) {
+func markdownify_html(html: String?, read: Bool, url: String?, baseurl: String = "") -> (String?, String, String?) {
     var title: String?
     var sourceUrl = url
 
@@ -112,7 +112,7 @@ func markdownify_html(html: String?, read: Bool, url: String?, baseurl: String? 
         }
     }
 
-    let h = HTML2Text(baseurl: baseurl!)
+    let h = HTML2Text(baseurl: baseurl)
     h.links_each_paragraph = grafLinks
     h.inline_links = inline
     h.unicode_snob = unicodeSnob
@@ -120,7 +120,7 @@ func markdownify_html(html: String?, read: Bool, url: String?, baseurl: String? 
     h.body_width = wrapWidth
 
     let html2textresult = h
-        .main(baseurl: baseurl ?? "", data: html)
+        .main(baseurl: baseurl, data: html)
         .replacingOccurrences(of: #"([*-+] .*?)\n+(?=[*-+] )"#, with: "$1\n", options: .regularExpression)
         .replacingOccurrences(of: #"(?m)\n{2,}"#, with: "\n\n")
         .replacingOccurrences(of: "__BR__", with: "  ")
