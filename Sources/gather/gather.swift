@@ -64,7 +64,7 @@ func iso_datetime() -> String {
     return dateFormatterPrint.string(from: Date())
 }
 
-func markdownify_input(html: String?, read: Bool) -> (String?, String, String?) {
+func markdownify_input(html: String, read: Bool) -> (String?, String, String?) {
     let read = read
     return markdownify_html(html: html, read: read, url: nil)
 }
@@ -76,13 +76,10 @@ func countH1s(_ s: String, title: String?) -> Int {
     return re.matches(in: s, options: [], range: checkRange).count
 }
 
-func markdownify_html(html: String?, read: Bool, url: String?, baseurl: String = "") -> (String?, String, String?) {
+func markdownify_html(html: String, read: Bool, url: String?, baseurl: String = "") -> (String?, String, String?) {
     var title: String?
     var sourceUrl = url
-
-    guard var html else {
-        return (title, "", url)
-    }
+    var html = html
 
     do {
         let readability = Readability(html: html)
