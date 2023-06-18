@@ -17,7 +17,7 @@ signature="Developer ID Installer: Brett Terpstra (47TRS7H4BH)"
 dev_team="47TRS7H4BH"
 
 # the label of the keychain item which contains an app-specific password
-dev_keychain_label="Developer-altool"
+dev_keychain_label="Developer-notarytool"
 
 projectdir='.'
 
@@ -26,10 +26,10 @@ pkgroot="$builddir/package"
 
 requeststatus() { # $1: requestUUID
     requestUUID=${1?:"need a request UUID"}
-    req_status=$(xcrun altool --notarization-info "$requestUUID" \
-                              --username "$dev_account" \
-                              --password "@keychain:$dev_keychain_label" 2>&1 \
-                 | awk -F ': ' '/Status:/ { print $2; }' )
+    req_status=$(xcrun notarytool info \
+                              --keychain-profile "$dev_keychain_label" \
+                              "$requestUUID" 2>&1 \
+                 | awk -F ': ' '/status:/ { print $2; }' )
     echo "$req_status"
 }
 
@@ -39,12 +39,10 @@ notarizefile() { # $1: path to file to notarize, $2: identifier
     
     # upload file
     echo "## uploading $filepath for notarization"
-    requestUUID=$(xcrun altool --notarize-app \
-                               --primary-bundle-id "$identifier" \
-                               --username "$dev_account" \
-                               --password "@keychain:$dev_keychain_label" \
-                               --file "$filepath" 2>&1 \
-                  | awk '/RequestUUID/ { print $NF; }')
+    requestUUID=$(xcrun notarytool submit --wait \
+                               --keychain-profile "$dev_keychain_label" \
+                               "$filepath" 2>&1 \
+                  | awk '/  id:/ { print $NF; }' | tail -n 1)
                                
     echo "Notarization RequestUUID: $requestUUID"
     
@@ -53,25 +51,26 @@ notarizefile() { # $1: path to file to notarize, $2: identifier
         exit 1
     fi
         
-    # wait for status to be not "in progress" any more
-    request_status="in progress"
-    while [[ "$request_status" == "in progress" ]]; do
-        echo -n "waiting... "
-        sleep 10
-        request_status=$(requeststatus "$requestUUID")
-        echo "$request_status"
-    done
+    # # wait for status to be not "in progress" any more
+    # request_status="Accepted"
+
+    # while [[ "$request_status" == "Accepted" ]]; do
+    #     echo -n "waiting... "
+    #     sleep 10
+    #     request_status=$(requeststatus "$requestUUID")
+    #     echo "$request_status"
+    # done
     
     # print status information
-    xcrun altool --notarization-info "$requestUUID" \
-                 --username "$dev_account" \
-                 --password "@keychain:$dev_keychain_label"
+    xcrun notarytool info \
+                 --keychain-profile "$dev_keychain_label" \
+                 "$requestUUID"
     echo 
     
-    if [[ $request_status != "success" ]]; then
-        echo "## could not notarize $filepath"
-        exit 1
-    fi
+    # if [[ $request_status != "success" ]]; then
+    #     echo "## could not notarize $filepath"
+    #     exit 1
+    # fi
     
 }
 
