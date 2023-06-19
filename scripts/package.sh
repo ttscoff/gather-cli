@@ -52,14 +52,14 @@ notarizefile() { # $1: path to file to notarize, $2: identifier
     fi
         
     # # wait for status to be not "in progress" any more
-    # request_status="Accepted"
+    request_status="In Progress"
 
-    # while [[ "$request_status" == "Accepted" ]]; do
-    #     echo -n "waiting... "
-    #     sleep 10
-    #     request_status=$(requeststatus "$requestUUID")
-    #     echo "$request_status"
-    # done
+    while [[ "$request_status" == "In Progress" ]]; do
+        echo -n "waiting... "
+        sleep 10
+        request_status=$(requeststatus "$requestUUID")
+        echo "$request_status"
+    done
     
     # print status information
     xcrun notarytool info \
