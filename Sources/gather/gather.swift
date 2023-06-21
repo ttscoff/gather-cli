@@ -5,7 +5,7 @@ import Foundation
 import HTML2Text
 import Readability
 import Yams
-var VERSION = "2.1.4"
+var VERSION = "2.1.5"
 
 var acceptedAnswerOnly = false
 var disableReadability = false
