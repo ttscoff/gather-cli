@@ -1,7 +1,7 @@
-desc 'Development version check'
+desc "Development version check"
 task :ver do
   gver = `git ver`
-  cver = IO.read(File.join(File.dirname(__FILE__), 'CHANGELOG.md')).match(/^#+ (\d+\.\d+\.\d+(\w+)?)/)[1]
+  cver = IO.read(File.join(File.dirname(__FILE__), "CHANGELOG.md")).match(/^#+ (\d+\.\d+\.\d+(\w+)?)/)[1]
   res = `grep VERSION lib/na/version.rb`
   version = res.match(/VERSION *= *['"](\d+\.\d+\.\d+(\w+)?)/)[1]
   puts "git tag: #{gver}"
@@ -9,7 +9,7 @@ task :ver do
   puts "changelog: #{cver}"
 end
 
-desc 'Changelog version check'
+desc "Changelog version check"
 task :cver do
-  puts IO.read(File.join(File.dirname(__FILE__), 'CHANGELOG.md')).match(/^#+ (\d+\.\d+\.\d+(\w+)?)/)[1]
+  puts IO.read(File.join(File.dirname(__FILE__), "CHANGELOG.md")).match(/^#+ (\d+\.\d+\.\d+(\w+)?)/)[1]
 end
