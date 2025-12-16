@@ -13,3 +13,4 @@ package
 .gitsecret/keys/random_seed
 !*.secret
 gather
+tag_message.txt
