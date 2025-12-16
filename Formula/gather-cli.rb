@@ -7,7 +7,7 @@
 class GatherCli < Formula
   desc "Readability and Markdown utility for saving web urls and HTML text"
   homepage "https://brettterpstra.com/projects/gather-cli/"
-  version "2.1.6"
+  version "2.1.7"
   license "MIT"
 
   on_macos do

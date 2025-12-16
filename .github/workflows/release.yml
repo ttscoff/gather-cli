@@ -60,6 +60,7 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
+                  tag_name: v${{ env.VERSION }}
                   body: ${{ steps.tag_message.outputs.body }}
                   generate_release_notes: false
                   files: |
