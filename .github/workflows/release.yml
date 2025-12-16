@@ -1,0 +1,67 @@
+name: Release
+
+on:
+    push:
+        tags:
+            - "v*"
+
+permissions:
+    contents: write
+
+jobs:
+    build-macos:
+        runs-on: macos-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Set up version
+              id: version
+              run: |
+                  VERSION=${GITHUB_REF#refs/tags/v}
+                  echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+                  echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+            - name: Extract tag message
+              id: tag_message
+              run: |
+                  TAG_NAME=${GITHUB_REF#refs/tags/}
+                  TAG_MESSAGE=$(git tag -l --format='%(contents)' "$TAG_NAME")
+                  TAG_MESSAGE=$(echo "$TAG_MESSAGE" | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}' -e 's/^[[:space:]]*//;s/[[:space:]]*$//')
+                  {
+                    echo 'body<<EOF'
+                    echo "$TAG_MESSAGE"
+                    echo 'EOF'
+                  } >> "$GITHUB_OUTPUT"
+
+            - name: Build macOS universal binary
+              env:
+                  VERSION: ${{ env.VERSION }}
+              run: |
+                  set -euo pipefail
+                  xcrun swift --version
+                  xcrun swift build -c release --arch arm64 --arch x86_64
+                  BINDIR=$(xcrun swift build -c release --arch arm64 --arch x86_64 --show-bin-path)
+                  mkdir -p "release/gather-cli-${VERSION}-macos-universal"
+                  cp "${BINDIR}/gather" "release/gather-cli-${VERSION}-macos-universal/gather"
+
+            - name: Create archive and checksum
+              env:
+                  VERSION: ${{ env.VERSION }}
+              run: |
+                  set -euo pipefail
+                  cd release
+                  tar -czf "gather-cli-${VERSION}-macos-universal.tar.gz" "gather-cli-${VERSION}-macos-universal"
+                  shasum -a 256 "gather-cli-${VERSION}-macos-universal.tar.gz" > "gather-cli-${VERSION}-macos-universal.tar.gz.sha256"
+                  cat "gather-cli-${VERSION}-macos-universal.tar.gz.sha256"
+
+            - name: Upload release assets
+              uses: softprops/action-gh-release@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  body: ${{ steps.tag_message.outputs.body }}
+                  generate_release_notes: false
+                  files: |
+                      release/gather-cli-${{ env.VERSION }}-macos-universal.tar.gz
+                      release/gather-cli-${{ env.VERSION }}-macos-universal.tar.gz.sha256
