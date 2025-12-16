@@ -79,20 +79,22 @@ notarizefile() { # $1: path to file to notarize, $2: identifier
 xcrun swift build -c release --arch arm64 --arch x86_64
 bindir=$(xcrun swift build -c release --arch arm64 --arch x86_64 --show-bin-path)
 
-# Determine signing identity (allow override via environment variable)
-APP_SIGNING_IDENTITY="${APP_SIGNING_IDENTITY:-Developer ID Installer: Brett Terpstra (47TRS7H4BH)}"
+# Determine signing identity for binary (allow override via environment variable)
+# Default to 3rd Party Mac Developer Application (for Mac App Store) or Developer ID Application (for direct distribution)
+APP_SIGNING_IDENTITY="${APP_SIGNING_IDENTITY:-3rd Party Mac Developer Application: Brett Terpstra (47TRS7H4BH)}"
+
+# Initialize notarization flag - will be set based on PKG signing success
+SKIP_NOTARIZATION=true
 
 # Check if the identity exists, if not use ad-hoc signing
 if security find-identity -v -p codesigning | grep -q "$APP_SIGNING_IDENTITY"; then
-	echo "## Signing with: $APP_SIGNING_IDENTITY"
+	echo "## Signing binary with: $APP_SIGNING_IDENTITY"
 	codesign --force --verbose --sign "$APP_SIGNING_IDENTITY" -o runtime --timestamp $bindir/$executable
 	codesign --verify -vvvv $bindir/$executable
-	SKIP_NOTARIZATION=false
 else
-	echo "## Warning: Identity '$APP_SIGNING_IDENTITY' not found, using ad-hoc signing"
+	echo "## Warning: Identity '$APP_SIGNING_IDENTITY' not found, using ad-hoc signing for binary"
 	codesign --force --verbose --sign "-" $bindir/$executable
 	codesign --verify -vvvv $bindir/$executable
-	SKIP_NOTARIZATION=true
 fi
 
 rm -rf package
@@ -114,8 +116,8 @@ if [ -n "$INSTALLER_SIGNATURE" ] && [ "$INSTALLER_SIGNATURE" != "-" ]; then
 		--sign "$INSTALLER_SIGNATURE" \
 		"$pkgpath" 2>&1; then
 		echo "## ✓ PKG signed successfully"
-		# PKG is signed, can be notarized (if binary was also properly signed)
-		# SKIP_NOTARIZATION remains false if binary was signed, true if ad-hoc
+		# PKG is signed with Developer ID Installer, can be notarized
+		SKIP_NOTARIZATION=false
 	else
 		PKG_BUILD_EXIT=$?
 		echo "## Warning: Failed to sign with '$INSTALLER_SIGNATURE' (exit code: $PKG_BUILD_EXIT), building unsigned pkg"
