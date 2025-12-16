@@ -1,3 +1,9 @@
+## 2.1.7
+
+#### NEW
+
+- Homebrew formula installs binaries without requiring Xcode
+
 ## 2.1.6
 
 ## 2.1.5
