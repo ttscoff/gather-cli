@@ -103,19 +103,24 @@ pkgpath="$builddir/$productname-$version.pkg"
 
 echo "## building pkg: $pkgpath"
 
-# Check if installer signing identity is provided and exists
+# Check if installer signing identity is provided
 if [ -n "$INSTALLER_SIGNATURE" ] && [ "$INSTALLER_SIGNATURE" != "-" ]; then
-	if security find-identity -v -p codesigning | grep -q "$INSTALLER_SIGNATURE"; then
-		echo "## Signing PKG with: $INSTALLER_SIGNATURE"
-		pkgbuild --root "$pkgroot" \
-			--version "$version" \
-			--identifier "$identifier" \
-			--sign "$INSTALLER_SIGNATURE" \
-			"$pkgpath"
+	# Try to use the certificate directly - pkgbuild can use installer certs
+	# even if they don't show up in security find-identity
+	echo "## Attempting to sign PKG with: $INSTALLER_SIGNATURE"
+	if pkgbuild --root "$pkgroot" \
+		--version "$version" \
+		--identifier "$identifier" \
+		--sign "$INSTALLER_SIGNATURE" \
+		"$pkgpath" 2>&1; then
+		echo "## ✓ PKG signed successfully"
 		# PKG is signed, can be notarized (if binary was also properly signed)
 		# SKIP_NOTARIZATION remains false if binary was signed, true if ad-hoc
 	else
-		echo "## Warning: Installer identity '$INSTALLER_SIGNATURE' not found, building unsigned pkg"
+		PKG_BUILD_EXIT=$?
+		echo "## Warning: Failed to sign with '$INSTALLER_SIGNATURE' (exit code: $PKG_BUILD_EXIT), building unsigned pkg"
+		# Remove the failed signed package and build unsigned
+		rm -f "$pkgpath"
 		pkgbuild --root "$pkgroot" \
 			--version "$version" \
 			--identifier "$identifier" \
