@@ -185,6 +185,22 @@ These are the other options he uses along with it:
 
     --url-open --inline-links --no-paragraph-links --fallback-title 'webclip %date'
 
+### Agent Integrations (Cursor/Claude)
+
+Gather works well as a local "URL to Markdown" tool for agent workflows.
+
+- Repository skill definition: [`SKILL.md`](../SKILL.md)
+- MCP server sketch and setup: [`examples/mcp-gather-import/README.md`](../examples/mcp-gather-import/README.md)
+
+The skill file documents recommended defaults for importing web pages as
+Markdown (`--metadata-yaml --inline-links --no-paragraph-links`) and includes
+fallback behavior (`--no-readability` or `--html --stdin`) for pages that fail
+readability extraction.
+
+The MCP example wraps `gather` in a single tool (`import_webpage_markdown`) so
+an MCP client can call it directly and receive structured output containing the
+URL, Markdown body, and whether fallback mode was used.
+
 ### Troubleshooting
 
 #### No content returned, only title
