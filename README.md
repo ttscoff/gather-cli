@@ -1,5 +1,3 @@
-# Gather CLI
-
 ![Howzit banner image](https://cdn3.brettterpstra.com/uploads/2022/08/gatherheader-rb.webp)
 
 

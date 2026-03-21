@@ -1,0 +1,15 @@
+{
+  "name": "mcp-gather-import",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "MCP server sketch that wraps gather CLI for URL to markdown imports",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.4",
+    "zod": "^4.1.5"
+  }
+}
